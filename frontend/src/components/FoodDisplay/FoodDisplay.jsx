@@ -10,7 +10,11 @@ import FoodItem from '../FoodItem/FoodItem'
         <h2>Top dishes near you</h2>
         <div className="food-display-list">
             { food_list.map((item,index)=>{
-                    return( <FoodItem key={index} id={item._id} name={item.name} price={item.price} description={item.description} image={item.image} /> )
+                (console.log("filter-ctagory",catagory,"item-cat",item.category));
+                if(catagory === "All" || catagory===item.category){
+                     return( <FoodItem key={index} id={item._id} name={item.name} price={item.price} description={item.description} image={item.image} /> );
+                }
+                   
                 })}
         </div>
     </div>
