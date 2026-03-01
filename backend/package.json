@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "food delivery website",
+  "license": "ISC",
+  "author": "Getacher",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "server":"nodemon server.js"
+  }
+}

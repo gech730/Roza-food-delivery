@@ -10,13 +10,13 @@ const App = () => {
   const [showLogin,setShowLogin]=useState(false);
   return (
     <>
-    {showLogin?<LoginPopUp/>:<></>}
+    {showLogin?<LoginPopUp setShowLogin={setShowLogin}/>:<></>}
       <div className='app'>
    <Navarbar setShowLogin={setShowLogin} />
    <Routes>
       <Route path='/' element={<Home/>}/>
       <Route path='/cart' element={<Cart/>}/>
-      <Route path='/placeOrder' element={<PlaceOrder/>}/>
+      <Route path='/order' element={<PlaceOrder/>}/>
    </Routes>
    <Footer/>
    </div>
