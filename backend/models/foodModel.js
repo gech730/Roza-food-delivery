@@ -11,5 +11,5 @@ const foodShema= new Schema({
     },
     category:{type:String,required:true}
 });
-const foodModel=model.food|| model("food",foodShema);
-export default foodModel;
+const food_list=model.food|| model("food_list",foodShema);
+export default food_list;
