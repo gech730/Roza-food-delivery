@@ -10,7 +10,8 @@ function ExploreMenu({catagory,setCatagory}) {
        {
         menu_list.map((item,index)=>{
           return  (
-            <div onClick={()=>setCatagory(
+            <div 
+            onClick={()=>setCatagory(
               prev=>prev===item.menu_name?"All":item.menu_name
             )} key={index} className="explore-menu-list-item">
              <img className={catagory===item.menu_name?"active":""} src={item.menu_image} alt="" />

@@ -26,10 +26,10 @@
 }
 .explore-menu-list-item img{
     width: 7.5vw;
-    min-width: 80px;
+    min-width: 60px;
     cursor: pointer;
     border-radius: 50%;
-    transition: .2s;
+    transition:all .2s;
 }
 .explore-menu-list-item p{
     margin-top: 10px;

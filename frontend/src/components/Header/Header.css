@@ -7,13 +7,13 @@
 }
 .header-contents{
     position: absolute;
+    bottom: 10%;
+    left: 6vw;
     display: flex;
     flex-direction: column;
     align-items: start;
     gap: 1.5vw;
     max-width:50% ;
-    bottom: 10%;
-    left: 6vw;
     animation: fadeIn 3s;
 }
 .header-contents h2{
@@ -34,7 +34,7 @@
     font-size: max(1vw,13px);
     border-radius: 50px;
 }
-@media(max-width:1050px){
+ @media(max-width:1050px){
     .header-contents{
         max-width:65% ;
     }
@@ -50,4 +50,4 @@
     .header-contents button{
      padding: 2vw 4vw;
     }
-}
+} 

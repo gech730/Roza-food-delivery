@@ -1,5 +1,6 @@
 import {Router} from 'express';
-import foodModel from '../models/foodModel.js';
+import { addFood,readFood } from '../controllers/foodController.js';
 const router=Router();
-router.post("/add",foodModel);
+router.post("/add",addFood);
+router.get("/get",readFood);
 export default router;
