@@ -2,7 +2,7 @@ import userModel from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
-const JWT_SECRET="random#secret";
+// const JWT_SECRET="random#secret";
 const login =async (req,res)=>{
     try{
    const {password,email}=req.body;
@@ -24,7 +24,7 @@ const login =async (req,res)=>{
 };
 
  const createToken =  (userId)=>{
-     const sign =  jwt.sign({userId},JWT_SECRET);
+     const sign =  jwt.sign({userId},process.env.JWT_SECRET);
      return sign;
  }
 const register =async (req,res)=>{

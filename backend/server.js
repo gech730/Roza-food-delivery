@@ -3,7 +3,8 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import foodRouter from './routes/foodRoute.js';
 import userRouter from './routes/userRoute.js';
-// import 'dotenv /config.js'
+import cartRouter from './routes/cartRoute.js';
+import 'dotenv/config.js'
  const app=express();
  app.use(cors());
  app.use(express.json());
@@ -14,6 +15,7 @@ import userRouter from './routes/userRoute.js';
  });
  app.use("/api/food",foodRouter);
  app.use('/api/user',userRouter);
+  app.use('/api/cart',cartRouter);
  app.listen(4000, ()=>{
     try{console.log("Server running...on http://localhost:4000/api/food");}catch(err){
         console.log("ERROR During server runing:",err)

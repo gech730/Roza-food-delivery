@@ -5,8 +5,45 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   const url="http://localhost:4000";
   const [cartItems, setCartItems] = useState({});
+
   const [token, setToken] = useState("");
-  const [food_list,setFood_list]=useState([])
+
+  const [food_list,setFood_list]=useState([]);
+
+  useEffect(() => {
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+}, [cartItems]);
+
+  const fetchFoodList = async ()=>{
+    const res = await axios.get(`${url}/api/food/get`);
+    if(res.data.success){
+      setFood_list(res.data.data);
+    }
+    else{
+      alert(res.data.message);
+    }
+  } ;
+
+  useEffect(() => {
+  const loadPage =async ()=>{
+        await fetchFoodList();
+
+        const storedCart = localStorage.getItem("cartItems");
+      if (storedCart) {
+        setCartItems(JSON.parse(storedCart));
+      };
+
+        const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        setToken(storedToken);
+      };
+
+  };
+  loadPage();
+
+  
+}, []); 
+
   const addToCart = (itemId) => {
     if (!cartItems[itemId]) {
       setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
@@ -14,9 +51,11 @@ const StoreContextProvider = (props) => {
       setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
   };
+
   const removeFromCart = (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
   };
+
   const getTotalCartAmount = () => {
     let totalAmount = 0;
     for (const item in cartItems) {
@@ -28,27 +67,10 @@ const StoreContextProvider = (props) => {
     }
      return totalAmount;
   };
-  const fetchFoodList = async ()=>{
-    const res = await axios.get(`${url}/api/food/get`);
-    if(res.data.success){
-      setFood_list(res.data.data);
-    }
-    else{
-      alert(res.data.message);
-    }
-  }
-useEffect(() => {
-  const loadPage =()=>{
-    fetchFoodList();
-    const storedToken = localStorage.getItem("token");
-  if (storedToken) {
-    setToken(storedToken);
-  }
-  };
-  loadPage();
 
-  
-}, []);
+
+
+
 
   const contextValue = {
     food_list,

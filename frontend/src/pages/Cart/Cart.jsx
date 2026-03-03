@@ -17,7 +17,8 @@ function Cart() {
           <p>Remove</p>
         </div>
         <br />
-        <hr />{food_list.map((item,index)=>{
+        <hr />
+        {food_list.map((item,index)=>{
           if(cartItems[item._id]>0){
             return(
               <div key={index}>
