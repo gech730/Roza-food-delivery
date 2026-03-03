@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET="random#secret";
 const login =async (req,res)=>{
     try{
-   const {name,email}=req.body;
+   const {password,email}=req.body;
    const user = await userModel.findOne({email});
    if (!user) {
         return   res.json({successs:false,message:"user does not exist !"});
