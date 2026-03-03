@@ -13,7 +13,7 @@ import userRouter from './routes/userRoute.js';
   res.status(200).send("API working")
  });
  app.use("/api/food",foodRouter);
- app.use('api/user',userRouter);
+ app.use('/api/user',userRouter);
  app.listen(4000, ()=>{
     try{console.log("Server running...on http://localhost:4000/api/food");}catch(err){
         console.log("ERROR During server runing:",err)
