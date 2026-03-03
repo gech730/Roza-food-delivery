@@ -11,10 +11,10 @@ const addFood= async (req,res)=>{
         category:req.body.category});
 
         await newFood.save();
-        res.status(201).json({succeess:true,message: "Food added successfully",newFood});
+        res.status(201).json({success:true,message: "Food added successfully",newFood});
     }
     catch(err){
-        res.status(500).json({succeess:true,message:" error",err});
+        res.status(500).json({success:false,message:" error",err});
     }
 }
 
@@ -23,7 +23,7 @@ const readFood= async (req,res)=>{
     try{
      const foods= await food_list.find({});
      if(!foods) return res.status(404).json({success:false,message:"not found"});
-     res.status(200).json({success:false,data:foods});
+     res.status(200).json({success:true,data:foods});
     }
     catch(err){
         res.status(500).json({success:false,message:err});
