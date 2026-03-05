@@ -8,9 +8,6 @@ const authMiddleware= async (req,res,next)=>{
     try {
         const token_decode=  jwt.verify(token,process.env.JWT_SECRET);
         req.userId=token_decode.userId;
-        //  if (token_decode)
-        //  return res.json({success:true,rid:token_decode.userId,body:req.body.userId});
-        //  req.body.userId=token_decode.userId;
          next();
     } catch (error) {
         console.log(error);

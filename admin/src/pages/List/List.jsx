@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import  { useState,useEffect } from 'react';
 import axios from 'axios'
 import './List.css'
 import { toast } from 'react-toastify';
@@ -9,7 +9,7 @@ const List = () => {
     const res=await axios.get(`${url}/api/food/get`);
     if(res.data.success){
       setList(res.data.data);
-
+       toast.success("fetched");
     }
     else{
        toast.error("error")
