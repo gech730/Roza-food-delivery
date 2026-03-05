@@ -28,8 +28,9 @@ const List = () => {
  }
 
   useEffect(()=>{
-   ()=>
-   { fetchList();}
+  const pageLoad= async ()=> { await  fetchList();}
+
+  pageLoad();
   },[])
 
   return (
