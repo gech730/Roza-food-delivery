@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import axios from "axios";
 import orderModel from '../models/orderModel.js';
 import userModel from '../models/userModel.js';
 const STRIPE_SECRET_KEY="sk_test_51T7Lz9P52Ry6fwxxsEVUf8EMHZpF7Ctn3Ll3Mfiium9daztsh6GbuelPo63fm12dqKUI4knzOWsLXUzf7lj2BDcU0032op0MYd";
@@ -101,4 +102,37 @@ const updateStatus = async (req,res)=>{
 }
 
 
-export {placeOrder,verifyPayment,userOrders,listOrders,updateStatus};
+export const initializePayment = async (req, res) => {
+
+  const { amount, email, first_name, last_name } = req.body;
+ const key="CHASECK_TEST-7KEoOJwmgmd5SBcuMEzGZA54kUEyYCJF";
+  try {
+
+    const response = await axios.post(
+      "https://api.chapa.co/v1/transaction/initialize",
+      {
+        amount: amount,
+        currency: "ETB",
+        email: email,
+        first_name: first_name,
+        last_name: last_name,
+        tx_ref: "tx-" + Date.now(),
+        callback_url: "http://localhost:5173/verify",
+        return_url: "http://localhost:5173/success"
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${key}`
+        }
+      }
+    );
+
+    res.json(response.data);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Payment failed" });
+  }
+};
+
+export {placeOrder,verifyPayment,userOrders,listOrders,updateStatus,initializePayment};
