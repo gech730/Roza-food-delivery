@@ -19,8 +19,7 @@ const List = () => {
   const res=await axios.delete(`${url}/api/food/remove`,{data:{_id:foodId}});
    await fetchList();
        if(res.data.success){
-           toast.success(res.data.message);
-           
+           toast.success(res.data.message); 
        }
      else{
        toast.error(res.data.message);
