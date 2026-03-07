@@ -33,7 +33,7 @@ function PlaceOrder() {
       amount: getTotalCartAmount() + 2,
     };
     const res = await axios.post(url + "/api/order/place", orderData, {
-      headers: { token }
+      headers: { token },
     });
 
     if (res.data.success) {
@@ -46,7 +46,6 @@ function PlaceOrder() {
   };
 
   const onChangeHandler = (event) => {
-    // event.preventDefault();
     const name = event.target.name;
     const value = event.target.value;
     setData((data) => ({ ...data, [name]: value }));

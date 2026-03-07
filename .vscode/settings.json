@@ -4,5 +4,7 @@
             "name": "Preset Connection",
             "connectionString": "mongodb://localhost:27017"
         }
-    ]
+    ],
+    "editor.inlayHints.fontSize": 10,
+    "editor.fontLigatures": false
 }
