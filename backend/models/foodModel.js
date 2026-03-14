@@ -1,4 +1,4 @@
-import {Schema,model} from 'mongoose';
+import moongoose,{Schema,model}  from  'mongoose';
 const foodShema= new Schema({
     name:{
         type:String,required:true
@@ -11,5 +11,5 @@ const foodShema= new Schema({
     },
     category:{type:String,required:true}
 });
-const food_list=model.food|| model("food_list",foodShema);
+const food_list=moongoose.models.food|| model("food_list",foodShema);
 export default food_list;

@@ -2,8 +2,8 @@ import mongoose from 'mongoose'
 const connectDB= async ()=>{
     const mongo_url="mongodb://localhost:27017/FOOD_DELIVERY";
     try{
+        // connecting to database
         await mongoose.connect(mongo_url);
-       
         console.log("Db connected");
     }catch(err){
         console.log(err);

@@ -33,7 +33,7 @@ function PlaceOrder() {
       amount: getTotalCartAmount() + 2,
     };
     const res = await axios.post(url + "/api/order/place", orderData, {
-      headers: { token },
+      headers: { token }
     });
 
     if (res.data.success) {
@@ -50,6 +50,7 @@ function PlaceOrder() {
     const value = event.target.value;
     setData((data) => ({ ...data, [name]: value }));
   };
+  
   return (
     <form onSubmit={plceOrder} className="place-order">
       <div className="place-order-left">

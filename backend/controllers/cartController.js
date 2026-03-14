@@ -1,9 +1,8 @@
-
-import userModel from '../models/userModel.js';
+import userModel from "../models/userModel.js";
 //  add to cart
 const addToCart = async (req, res) => {
   try {
-    const {itemId}=req.body
+    const { itemId } = req.body;
     const { userId } = req;
 
     const userData = await userModel.findById(userId);
@@ -28,7 +27,6 @@ const addToCart = async (req, res) => {
       message: "Added to cart",
       data: cartData,
     });
-
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
@@ -36,9 +34,9 @@ const addToCart = async (req, res) => {
 };
 
 //  remove from cart
-const removeCart  = async (req,res)=>{
-     try {
-       const {itemId}=req.body
+const removeCart = async (req, res) => {
+  try {
+    const { itemId } = req.body;
     const { userId } = req;
 
     const userData = await userModel.findById(userId);
@@ -63,31 +61,29 @@ const removeCart  = async (req,res)=>{
       message: "Removed from cart",
       data: cartData,
     });
-
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
   }
-}
+};
 
 //  get cart
-const getCart  = async (req,res)=>{
-    try {
-      const  userId  = req.userId;
-     const userData= await userModel.findById(userId);
-     if (!userData) {
+const getCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const userData = await userModel.findById(userId);
+    if (!userData) {
       return res.json({ success: false, message: "User not found" });
     }
 
     let cartData = userData.cartData;
-   if (Object.keys(cartData).length === 0) {
+    if (Object.keys(cartData).length === 0) {
       return res.json({ success: false, message: "cart is empty" });
     }
-     res.json({ success:true, cartData });
- } catch (error) {
-    console.log(error)
-         return res.json({ success: false, message:error });
-    }
-
-}
-export {addToCart,removeCart,getCart};
+    res.json({ success: true, cartData });
+  } catch (error) {
+    console.log(error);
+    return res.json({ success: false, message: error });
+  }
+};
+export { addToCart, removeCart, getCart };

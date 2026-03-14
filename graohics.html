@@ -1,0 +1,88 @@
+<canvas id="vwl"></canvas>
+<script>
+  var vw = document.getElementById("vwl");
+  var ctx = vw.getContext("2d");
+  var w = (vw.width = window.innerWidth);
+  var h = (vw.height = window.innerHeight);
+  ctx.fillStyle = "green";
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "red";
+  ctx.lineWidth = 3;
+
+  ctx.moveTo(200, 200);
+  ctx.lineTo(150, 300);
+
+  ctx.moveTo(200,200);
+  ctx.lineTo(165, 300);
+   ctx.moveTo(175,300);
+     ctx.lineTo(200,200);
+
+       ctx.lineTo(185,300);
+       ctx.moveTo(195,300);
+       ctx.lineTo(200,200);
+       ctx.lineTo(215,300);
+
+        ctx.moveTo(225,300);
+       ctx.lineTo(200,200);
+       ctx.lineTo(235,300);
+      ctx.moveTo(245,300);
+       ctx.lineTo(200,200);
+
+     
+   
+      
+
+       
+
+ 
+ 
+// left side
+ ctx.moveTo(150, 300);
+
+  ctx.lineTo(150, 400);
+  // right sude
+  ctx.lineTo(250, 400);
+  ctx.lineTo(250, 300);
+  ctx.lineTo(200, 200);
+
+  ctx.moveTo(150, 300);
+  // middle right
+  ctx.lineTo(250, 300);
+
+  ctx.moveTo(155, 320);
+  ctx.lineTo(175, 320);
+  ctx.lineTo(175, 340);
+  ctx.lineTo(155, 340);
+  ctx.lineTo(155, 320);
+
+  ctx.moveTo(245, 320);
+  ctx.lineTo(225, 320);
+  ctx.lineTo(225, 340);
+  ctx.lineTo(245, 340);
+  ctx.lineTo(245, 320);
+
+  ctx.moveTo(190, 390);
+  ctx.lineTo(210, 390);
+  ctx.lineTo(210, 355);
+  ctx.lineTo(190, 355);
+  ctx.lineTo(190, 390);
+ 
+  ctx.moveTo(200,200);
+// fence
+ ctx.moveTo(130,150);
+ ctx.lineTo(60,460);
+ ctx.lineTo(60,410);
+ ctx.lineTo(130,100);
+ ctx.lineTo(130,150);
+ ctx.moveTo(130,100);
+ ctx.lineTo(400,100);
+ ctx.lineTo(400,150);
+ ctx.lineTo(130,150);
+ctx.moveTo(400,150);
+ctx.lineTo(330,460);
+ctx.lineTo(330,410);
+ctx.lineTo(400,100);
+ctx.moveTo(0,150);
+
+  ctx.fill();
+</script>
