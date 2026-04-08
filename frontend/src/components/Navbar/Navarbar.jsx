@@ -34,6 +34,7 @@ const MoonIcon = () => (
 /**
  * Hamburger Menu Icon
  */
+
 const HamburgerIcon = ({ isOpen }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     {isOpen ? (
@@ -51,11 +52,9 @@ const HamburgerIcon = ({ isOpen }) => (
   </svg>
 );
 
-/**
- * Navbar Component
- * Main navigation bar with cart, profile, theme toggle and login/logout functionality
- */
+
 const Navarbar = ({ setShowLogin }) => {
+
   const navigate = useNavigate();
   const [menu, setMenu] = useState("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -75,10 +74,8 @@ const Navarbar = ({ setShowLogin }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  /**
-   * Handle User Logout
-   * Clears token and redirects to home
-   */
+  
+// user logout
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -88,6 +85,11 @@ const Navarbar = ({ setShowLogin }) => {
   /**
    * Get Profile Image URL
    */
+  useEffect(()=>{
+
+    getProfileImageUrl();
+    
+  },[token])
   const getProfileImageUrl = () => {
     if (userInfo?.profileImage) {
       return `${url}/images/${userInfo.profileImage}`;
@@ -97,18 +99,21 @@ const Navarbar = ({ setShowLogin }) => {
 
   return (
     <div className='navbar'>
-      {/* Logo Link to Home */}
+
+ {/* Hamburger Menu Button (Mobile) */}
+      <button 
+        className="hamburger-menu" 
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)} >
+
+        <HamburgerIcon isOpen={mobileMenuOpen} />
+
+      </button>
+
       <Link to="/">
         <img src={assets.logo} alt="Logo" className="logo" />
       </Link>
       
-      {/* Hamburger Menu Button (Mobile) */}
-      <button 
-        className="hamburger-menu" 
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      >
-        <HamburgerIcon isOpen={mobileMenuOpen} />
-      </button>
+     
 
       {/* Navigation Menu */}
       <ul className={`navbar-menu ${mobileMenuOpen ? 'open' : ''}`} ref={menuRef}>
@@ -118,10 +123,11 @@ const Navarbar = ({ setShowLogin }) => {
             setMenu("home");
             setMobileMenuOpen(false);
           }} 
-          className={menu === "home" ? "active" : ""}
-        >
+
+          className={menu === "home" ? "active" : ""}>
           Home
         </Link>
+
         <a 
           href='#explorer-menu' 
           onClick={() => {
@@ -155,6 +161,7 @@ const Navarbar = ({ setShowLogin }) => {
       </ul>
 
       {/* Right Side - Theme Toggle, Search, Cart, Profile */}
+
       <div className="navar-right">
         {/* Theme Toggle */}
         <button className="theme-toggle" onClick={toggleTheme} title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>
@@ -164,12 +171,11 @@ const Navarbar = ({ setShowLogin }) => {
         {/* Search Icon (Desktop only) */}
         <img src={assets.search_icon} alt="Search" className="search-icon" />
         
-        {/* Cart Icon with Badge */}
+     
         <div className="navbar-search-icon">
           <Link to="/cart">
             <img src={assets.basket_icon} alt="Cart" />
           </Link>
-          {/* Show dot indicator if cart has items */}
           <div className={getTotalCartAmount() === 0 ? "" : "dot"}></div>
         </div>
         
@@ -178,7 +184,7 @@ const Navarbar = ({ setShowLogin }) => {
           <button onClick={() => setShowLogin(true)} className="sign-in-btn">Sign In</button>
         ) : (
           <div className="navbar-profile">
-            {/* Profile Image or Icon */}
+           
             {getProfileImageUrl() ? (
               <img src={getProfileImageUrl()} alt="Profile" className="profile-image" />
             ) : (
@@ -186,7 +192,7 @@ const Navarbar = ({ setShowLogin }) => {
             )}
             
             <ul className='nav-profile-dropdown'>
-              {/* Profile Option */}
+            
               <li onClick={() => {
                 navigate("/profile");
                 setMobileMenuOpen(false);
@@ -194,8 +200,9 @@ const Navarbar = ({ setShowLogin }) => {
                 <img src={assets.profile_icon} alt="" />
                 <p>Profile</p>
               </li>
+
               <hr />
-              {/* Orders Option */}
+           
               <li onClick={() => {
                 navigate("/myOrder");
                 setMobileMenuOpen(false);
@@ -204,11 +211,13 @@ const Navarbar = ({ setShowLogin }) => {
                 <p>Orders</p>
               </li>
               <hr />
-              {/* Logout Option */}
+
+            
               <li onClick={handleLogout}>
                 <img src={assets.logout_icon} alt="" />
                 <p>Logout</p>
               </li>
+
             </ul>
           </div>
         )}

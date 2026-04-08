@@ -17,7 +17,6 @@ const App = () => {
 
   return (
     <>
-      {/* Login Popup Modal */}
       {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
       
       <div className='app'>

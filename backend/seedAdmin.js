@@ -5,15 +5,13 @@ import adminModel from "./models/adminModel.js";
 
 dotenv.config();
 
-/**
- * Admin Account Seeder
- * Creates a default admin account if none exists
- */
+
+ // Creates a default admin account if none exists
+ 
 
 const seedAdmin = async () => {
   try {
-    const mongo_url = "mongodb://localhost:27017/FOOD_DELIVERY";
-    await mongoose.connect(mongo_url);
+    await mongoose.connect(process.env.MONGO_URI || mongo_url);
     console.log("Connected to MongoDB");
 
     // Check if admin already exists

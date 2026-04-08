@@ -13,6 +13,7 @@
 .navbar .logo {
   width: 140px;
   cursor: pointer;
+  margin-left: auto;
 }
 
 /* Navigation Menu */
@@ -143,7 +144,7 @@
   position: absolute;
   display: none;
   right: 0;
-  top: 45px;
+  top: 35px;
   z-index: 1000;
   min-width: 200px;
 }
