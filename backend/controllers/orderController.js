@@ -1,9 +1,8 @@
-import Stripe from "stripe";
+import axios from "axios";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 
-// Initialize Stripe with secret key from environment variable
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder");
+
 
 // Frontend URL for payment redirects
 const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
@@ -14,67 +13,34 @@ const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
  */
 const placeOrder = async (req, res) => {
   try {
-    const { items, amount, address } = req.body;
-    const userId = req.userId;
-    
-    // Validate input
-    if (!items || items.length === 0) {
-      return res.json({ success: false, message: "No items in order" });
-    }
-    
-    // Create new order in database
-    const newOrder = new orderModel({
-      userId,
-      items,
-      amount,
-      address,
-      status: "Pending", // Initial order status
-    });
-
-    await newOrder.save();
-    
-    // Clear user's cart after placing order
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
-
-    // Prepare Stripe line items for each food item
-    const line_items = items.map((item) => ({
-      price_data: {
-        currency: "gbp",
-        product_data: {
-          name: item.name,
-          // Add description if available
-          description: item.description || "",
-        },
-        unit_amount: Math.round(item.price * 100 * 0.83), // Convert to cents
+        const { amount, email, first_name, last_name } = req.body;
+        const userId = req.userId;
+         const response = await axios.post(
+      "https://api.chapa.co/v1/transaction/initialize",
+      {
+        amount: amount,
+        currency: "ETB",
+        email: email,
+        first_name: first_name,
+        last_name: last_name,
+        tx_ref: "tx-" + Date.now(), // unique reference
+        callback_url: "http://localhost:8000/api/payment/verify",
+        return_url: "http://localhost:5173/payment-success",
       },
-      quantity: item.quantity,
-    }));
-
-    // Add delivery charges
-    line_items.push({
-      price_data: {
-        currency: "gbp",
-        product_data: {
-          name: "Delivery Charges",
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.CHAPA_SECRET_KEY}`,
         },
-        unit_amount: 2 * 100 * 0.83, // £2 delivery fee
-      },
-      quantity: 1,
-    });
-
-    // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      line_items,
-      mode: "payment",
-      success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
-    });
+      }
+    );
     
-    res.json({ success: true, session_url: session.url });
-    
+     res.json({
+      checkout_url: response.data.data.checkout_url,
+    });
+      
   } catch (error) {
     console.log("Place order error:", error);
-    res.json({ success: false, message: "Error placing order" });
+    res.json({ success: false, message: "Payment failed " });
   }
 };
 
