@@ -1,33 +1,60 @@
 import mongoose from 'mongoose'
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  // Profile image filename stored in uploads folder
-  profileImage: {
-    type: String,
-    default: null
-  },
-  cartData: {
-    type: Object,
-    default: {}
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+const userSchema = new mongoose.Schema( {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+
+    phone: {
+      type: String,
+    },
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    cartData: {
+      type: Object,
+      default: {},
+    },
+
+    address: {
+      fullName: String,
+      phone: String,
+      address: String,
+      city: String,
+      region: String,
+      postalCode: String,
+    },
+
+    // Authentication 
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+  },
+  { timestamps: true }
+)
 const userModel = mongoose.models.userModel || mongoose.model("userModel", userSchema);
 
 export default userModel;

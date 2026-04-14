@@ -1,7 +1,8 @@
 import {Router} from "express";
 import { 
-  placeOrder, 
-  verifyPayment, 
+  paymentInitialize, 
+  paymentCallback, 
+  verifyPayment,
   userOrders, 
   listOrders, 
   updateStatus,
@@ -26,22 +27,21 @@ const orderRouter = Router();
  * - POST /api/order/getbyid - Get single order (admin)
  */
 
-// POST /api/order/place - Place new order (user auth required)
-orderRouter.post("/place", authMiddleware, placeOrder);
 
-// POST /api/order/verify - Verify payment (user auth required)
-orderRouter.post("/verify", authMiddleware, verifyPayment);
+orderRouter.post("/initialize", authMiddleware, paymentInitialize);
 
-// POST /api/order/userorders - Get logged-in user's orders
+orderRouter.post("/callbackVerify", authMiddleware, paymentCallback);
+orderRouter.get("/verify/:tx_ref", verifyPayment);
+
 orderRouter.post("/userorders", authMiddleware, userOrders);
 
-// POST /api/order/list - Get all orders (admin only)
+
 orderRouter.post("/list", adminAuthMiddleware, listOrders);
 
-// POST /api/order/status - Update order status (admin only)
+
 orderRouter.post("/status", adminAuthMiddleware, updateStatus);
 
-// POST /api/order/getbyid - Get single order details (admin only)
+
 orderRouter.post("/getbyid", adminAuthMiddleware, getOrderById);
 
 export default orderRouter;

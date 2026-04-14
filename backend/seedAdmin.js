@@ -15,13 +15,13 @@ const seedAdmin = async () => {
     console.log("Connected to MongoDB");
 
     // Check if admin already exists
-    const adminExists = await adminModel.findOne({ email: "admin@fooddelivery.com" });
+    const adminExists = await adminModel.findOne({ email: "admin@foodsdelivery.com" });
     
     if (adminExists) {
       console.log("Admin account already exists");
     } else {
       // Create default admin account
-      const hashedPassword = await bcrypt.hash("admin123", 10);
+      const hashedPassword = await bcrypt.hash("admin1234", 10);
       
       const admin = new adminModel({
         name: "Admin",
