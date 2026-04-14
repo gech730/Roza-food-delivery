@@ -1,10 +1,12 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../utils/api";
+import { toast } from "react-toastify";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-  const url = "http://localhost:4000";
+  const url = BASE_URL;
   const [cartItems, setCartItems] = useState({});
   const [token, setToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
@@ -20,10 +22,10 @@ const StoreContextProvider = (props) => {
       if (res.data.success) {
         setFood_list(res.data.data);
       } else {
-        alert(res.data.message);
+        toast.error(res.data.message || "Failed to load menu");
       }
-    } catch (error) {
-      console.error("Error fetching food list:", error);
+    } catch {
+      toast.error("Failed to load menu. Please refresh.");
     }
   };
 
@@ -36,8 +38,8 @@ const StoreContextProvider = (props) => {
         if (res.data.success) {
           setCartItems(res.data.cartData);
         }
-      } catch (error) {
-        console.error("Error loading cart:", error);
+      } catch {
+        // silent — cart just stays empty
       }
     }
   };
@@ -51,8 +53,8 @@ const StoreContextProvider = (props) => {
         if (res.data.success) {
           setUserInfo(res.data.data);
         }
-      } catch (error) {
-        console.error("Error loading profile:", error);
+      } catch {
+        // silent
       }
     }
   };
@@ -79,39 +81,27 @@ const StoreContextProvider = (props) => {
 
 
   const addToCart = async (itemId) => {
-    if(!token){
-      return alert("please sign in first");
+    if (!token) {
+      toast.info("Please sign in to add items to cart");
+      return;
     }
-    
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    try {
+      await axios.post(`${url}/api/cart/add`, { itemId }, { headers: { token } });
+    } catch {
+      // revert optimistic update on failure
+      setCartItems((prev) => ({ ...prev, [itemId]: Math.max((prev[itemId] || 1) - 1, 0) }));
+      toast.error("Failed to update cart");
     }
-
-      try {
-        await axios.post(`${url}/api/cart/add`,
-          { itemId },
-          { headers: { token } },
-        );
-      } catch (error) {
-        console.error("Error adding to cart:", error);
-      }
-    
   };
-  
-  const removeFromCart = async (itemId) => {
 
-    if (token) {
-       setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-      try {
-        await axios.delete(`${url}/api/cart/remove`, {
-          data: { itemId },
-          headers: { token },
-        });
-      } catch (error) {
-        console.error("Error removing from cart:", error);
-      }
+  const removeFromCart = async (itemId) => {
+    if (!token) return;
+    setCartItems((prev) => ({ ...prev, [itemId]: Math.max((prev[itemId] || 1) - 1, 0) }));
+    try {
+      await axios.delete(`${url}/api/cart/remove`, { data: { itemId }, headers: { token } });
+    } catch {
+      // silent — UI already updated
     }
   };
  

@@ -1,189 +1,114 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './List.css';
 import { toast } from 'react-toastify';
+import './List.css';
 
-const List = ({ token }) => {
-  const url = "http://localhost:4000";
-  const [list, setList] = useState([]);
+const List = ({ url, token }) => {
+  const [list, setList]         = useState([]);
+  const [loading, setLoading]   = useState(true);
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: ''
-  });
+  const [editForm, setEditForm] = useState({ name: '', description: '', price: '', category: '' });
+  const [search, setSearch]     = useState('');
 
-  /**
-   * Fetch All Food Items
-   * Retrieves list of all food items from the database
-   */
   const fetchList = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(`${url}/api/food/get`);
-      if (res.data.success) {
-        setList(res.data.data);
-      } else {
-        toast.error(res.data.message || "Error fetching list");
-      }
-    } catch (error) {
-      console.error("Fetch list error:", error);
-      toast.error("Failed to fetch food list");
-    }
+      if (res.data.success) setList(res.data.data);
+      else toast.error(res.data.message);
+    } catch { toast.error('Failed to fetch products'); }
+    finally { setLoading(false); }
   };
 
-  /**
-   * Remove Food Item
-   * Deletes a food item from the database
-   */
-  const removeFood = async (foodId) => {
+  useEffect(() => { fetchList(); }, []);
+
+  const removeFood = async (id) => {
+    if (!window.confirm('Delete this product?')) return;
     try {
-      const res = await axios.delete(`${url}/api/food/remove`, {
-        data: { id: foodId },
-        headers: { token }
-      });
-      
-      if (res.data.success) {
-        toast.success(res.data.message);
-        await fetchList();
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.error("Remove food error:", error);
-      toast.error("Failed to remove food item");
-    }
+      const res = await axios.delete(`${url}/api/food/remove`, { data: { id }, headers: { token } });
+      if (res.data.success) { toast.success(res.data.message); fetchList(); }
+      else toast.error(res.data.message);
+    } catch { toast.error('Failed to delete product'); }
   };
 
-  /**
-   * Enable Edit Mode
-   * Sets the editing state and populates form with item data
-   */
   const startEdit = (item) => {
     setEditingId(item._id);
-    setEditForm({
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      category: item.category
-    });
+    setEditForm({ name: item.name, description: item.description, price: item.price, category: item.category });
   };
 
-  /**
-   * Cancel Edit
-   * Exits edit mode without saving changes
-   */
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditForm({
-      name: '',
-      description: '',
-      price: '',
-      category: ''
-    });
-  };
-
-  /**
-   * Save Food Item
-   * Updates the food item with new data
-   */
-  const saveEdit = async (foodId) => {
+  const saveEdit = async (id) => {
     try {
-      const res = await axios.post(
-        `${url}/api/food/update`,
-        {
-          id: foodId,
-          name: editForm.name,
-          description: editForm.description,
-          price: editForm.price,
-          category: editForm.category
-        },
-        { headers: { token } }
-      );
-      
-      if (res.data.success) {
-        toast.success(res.data.message);
-        setEditingId(null);
-        await fetchList();
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.error("Update food error:", error);
-      toast.error("Failed to update food item");
-    }
+      const res = await axios.post(`${url}/api/food/update`, { id, ...editForm }, { headers: { token } });
+      if (res.data.success) { toast.success(res.data.message); setEditingId(null); fetchList(); }
+      else toast.error(res.data.message);
+    } catch { toast.error('Failed to update product'); }
   };
 
-  // Fetch food list on component mount
-  useEffect(() => {
-    fetchList();
-  }, []);
+  const filtered = list.filter(i => i.name.toLowerCase().includes(search.toLowerCase()) || i.category.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className='add list flex-col'>
-      <p>All Foods List</p>
-      <div className="list-table">
-        <div className="list-table-format title">
-          <p>Image</p>
-          <p>Name</p>
-          <p>Category</p>
-          <p>Price</p>
-          <p>Action</p>
+    <div style={{ animation: 'fadeIn .4s' }}>
+      <div className="a-page-header">
+        <div><h1>Products</h1><p>{list.length} items on menu</p></div>
+      </div>
+
+      <div className="a-card list-toolbar">
+        <div className="a-search">
+          <span className="a-search-icon">🔍</span>
+          <input placeholder="Search products…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        {list.map((item, index) => (
-          <div key={index} className="list-table-format">
-            {/* Image */}
-            <img src={`${url}/images/${item.image}`} alt={item.name} />
-            
-            {/* Name - editable or display */}
-            {editingId === item._id ? (
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-              />
-            ) : (
-              <p>{item.name}</p>
-            )}
-            
-            {/* Category - editable or display */}
-            {editingId === item._id ? (
-              <input
-                type="text"
-                value={editForm.category}
-                onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-              />
-            ) : (
-              <p>{item.category}</p>
-            )}
-            
-            {/* Price - editable or display */}
-            {editingId === item._id ? (
-              <input
-                type="number"
-                value={editForm.price}
-                onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-              />
-            ) : (
-              <p>£{item.price}</p>
-            )}
-            
-            {/* Action buttons */}
-            <div className="action-buttons">
-              {editingId === item._id ? (
-                <>
-                  <button onClick={() => saveEdit(item._id)} className="save-btn">Save</button>
-                  <button onClick={cancelEdit} className="cancel-btn">Cancel</button>
-                </>
-              ) : (
-                <>
-                  <button onClick={() => startEdit(item)} className="edit-btn">Edit</button>
-                  <button onClick={() => removeFood(item._id)} className="cursor">X</button>
-                </>
-              )}
-            </div>
-          </div>
-        ))}
+      </div>
+
+      <div className="a-card">
+        {loading ? (
+          <div className="a-spinner-wrap"><div className="a-spinner" /></div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)' }}>🍽️ No products found.</div>
+        ) : (
+          <table className="a-table">
+            <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+            <tbody>
+              {filtered.map(item => (
+                <tr key={item._id}>
+                  <td><img src={`${url}/images/${item.image}`} alt={item.name} className="list-item-img" onError={e => { e.target.style.display = 'none'; }} /></td>
+                  <td>
+                    {editingId === item._id
+                      ? <input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                      : <strong style={{ fontSize: 14 }}>{item.name}</strong>
+                    }
+                  </td>
+                  <td>
+                    {editingId === item._id
+                      ? <input value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} />
+                      : <span className="a-badge" style={{ background: 'var(--surface2)', color: 'var(--text2)' }}>{item.category}</span>
+                    }
+                  </td>
+                  <td>
+                    {editingId === item._id
+                      ? <input type="number" value={editForm.price} onChange={e => setEditForm({ ...editForm, price: e.target.value })} style={{ width: 90 }} />
+                      : <span style={{ fontWeight: 700, color: 'var(--brand)' }}>${item.price}</span>
+                    }
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {editingId === item._id ? (
+                        <>
+                          <button className="a-btn a-btn-primary a-btn-sm" onClick={() => saveEdit(item._id)}>Save</button>
+                          <button className="a-btn a-btn-ghost a-btn-sm" onClick={() => setEditingId(null)}>Cancel</button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="a-btn a-btn-ghost a-btn-sm" onClick={() => startEdit(item)}>✏️ Edit</button>
+                          <button className="a-btn a-btn-danger a-btn-sm" onClick={() => removeFood(item._id)}>🗑️ Delete</button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

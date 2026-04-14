@@ -1,0 +1,7 @@
+﻿.pay-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
+.pay-stat{display:flex;align-items:center;gap:14px;padding:18px 20px;}
+.pay-stat-icon{font-size:28px;}
+.pay-stat-label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.pay-stat-value{font-size:24px;font-weight:800;color:var(--text);}
+.pay-toolbar{display:flex;gap:8px;padding:14px 16px;margin-bottom:16px;}
+@media(max-width:768px){.pay-summary{grid-template-columns:1fr;}}

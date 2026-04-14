@@ -4,158 +4,88 @@ import { toast } from 'react-toastify';
 import './Add.css';
 import { assets } from '../../assets/assets';
 
-/**
- * Add New Food Item Component
- * Allows admin to add new food items to the menu
- */
+const CATEGORIES = ['Salad','Rolls','Deserts','Sandwich','Cake','Pure Veg','Pasta','Noodles','Biryani','Drinks'];
+
 const Add = ({ url, token }) => {
-  const [image, setImage] = useState(false);
-  const [data, setData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "salad"
-  });
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({ name: '', description: '', price: '', category: 'Salad' });
 
-  /**
-   * Handle Input Changes
-   * Updates form data state when user types
-   */
-  const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((data) => ({ ...data, [name]: value }));
-  };
+  const onChange = e => setData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  /**
-   * Handle Form Submit
-   * Sends food item data to backend
-   */
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
-    
-    // Validate image
-    if (!image) {
-      return toast.error("Please upload an image");
-    }
-
-    // Validate required fields
-    if (!data.name || !data.price) {
-      return toast.error("Name and price are required");
-    }
-
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (!image) return toast.error('Please upload a product image');
+    setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("description", data.description);
-      formData.append("price", Number(data.price));
-      formData.append("category", data.category);
-      formData.append("image", image);
-
-      const res = await axios.post(`${url}/api/food/add`, formData, {
-        headers: { token }
-      });
-
+      const form = new FormData();
+      Object.entries(data).forEach(([k, v]) => form.append(k, k === 'price' ? Number(v) : v));
+      form.append('image', image);
+      const res = await axios.post(`${url}/api/food/add`, form, { headers: { token } });
       if (res.data.success) {
-        // Reset form on success
-        setData({
-          name: "",
-          description: "",
-          price: "",
-          category: "salad"
-        });
-        setImage(false);
-        toast.success(res.data.message);
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.error("Add food error:", error);
-      toast.error(error.response?.data?.message || "Failed to add food item");
-    }
+        toast.success('Product added successfully!');
+        setData({ name: '', description: '', price: '', category: 'Salad' });
+        setImage(null);
+      } else toast.error(res.data.message);
+    } catch { toast.error('Failed to add product'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className='add'>
-      <form className='flex-col' onSubmit={onSubmitHandler}>
-        {/* Image Upload Section */}
-        <div className="add-img-upload flex-col">
-          <p>Upload Image</p>
-          <label htmlFor="image">
-            <img 
-              src={image ? URL.createObjectURL(image) : assets.upload_area} 
-              alt="Upload area" 
-            />
-          </label>
-          <input 
-            onChange={(e) => setImage(e.target.files[0])} 
-            type="file" 
-            id='image' 
-            hidden 
-            required 
-            accept="image/*"
-          />
-        </div>
+    <div style={{ animation: 'fadeIn .4s' }}>
+      <div className="a-page-header">
+        <div><h1>Add Product</h1><p>Add a new item to the menu</p></div>
+      </div>
 
-        {/* Product Name Section */}
-        <div className="add-product-name flex-col">
-          <p>Product name</p>
-          <input 
-            onChange={onChangeHandler} 
-            value={data.name} 
-            type="text" 
-            name='name' 
-            placeholder='Type product name' 
-            required
-          />
-        </div>
-
-        {/* Product Description Section */}
-        <div className="add-product-description flex-col">
-          <p>Product description</p>
-          <textarea 
-            onChange={onChangeHandler} 
-            value={data.description} 
-            name="description" 
-            rows={3} 
-            placeholder='Write product description'
-          ></textarea>
-        </div>
-
-        {/* Category and Price Section */}
-        <div className="add-category-price">
-          <div className="add-category flex-col">
-            <p>Product Category</p>
-            <select onChange={onChangeHandler} name="category" value={data.category}>
-              <option value="salad">Salad</option>
-              <option value="Rolls">Rolls</option>
-              <option value="Deserts">Deserts</option>
-              <option value="Sandwich">Sandwich</option>
-              <option value="Cake">Cake</option>
-              <option value="Pure">Pure Veg</option>
-              <option value="Pasta">Pasta</option>
-              <option value="Noodles">Noodles</option>
-              <option value="Biryani">Biryani</option>
-              <option value="Drinks">Drinks</option>
-            </select>
+      <div className="a-card add-form-card">
+        <form onSubmit={onSubmit} className="add-form">
+          {/* Image upload */}
+          <div className="add-image-section">
+            <label htmlFor="img-upload" className="add-image-label">
+              {image
+                ? <img src={URL.createObjectURL(image)} alt="Preview" className="add-image-preview" />
+                : (
+                  <div className="add-image-placeholder">
+                    <span>📷</span>
+                    <p>Click to upload image</p>
+                    <small>PNG, JPG up to 5MB</small>
+                  </div>
+                )
+              }
+            </label>
+            <input id="img-upload" type="file" accept="image/*" hidden onChange={e => setImage(e.target.files[0])} />
           </div>
 
-          <div className="add-price flex-col">
-            <p>Product Price (£)</p>
-            <input 
-              onChange={onChangeHandler} 
-              value={data.price}  
-              type="number" 
-              name="price" 
-              placeholder='20' 
-              required
-              min="0"
-            />
-          </div>
-        </div>
+          <div className="add-fields">
+            <div className="add-field-group">
+              <label>Product Name *</label>
+              <input name="name" value={data.name} onChange={onChange} placeholder="e.g. Injera with Tibs" required />
+            </div>
 
-        <button type="submit" className='add-btn'>ADD FOOD ITEM</button>
-      </form>
+            <div className="add-field-group">
+              <label>Description</label>
+              <textarea name="description" value={data.description} onChange={onChange} rows={3} placeholder="Describe the dish…" />
+            </div>
+
+            <div className="add-row">
+              <div className="add-field-group">
+                <label>Category *</label>
+                <select name="category" value={data.category} onChange={onChange}>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="add-field-group">
+                <label>Price (ETB) *</label>
+                <input name="price" type="number" value={data.price} onChange={onChange} placeholder="e.g. 150" required min="1" />
+              </div>
+            </div>
+
+            <button type="submit" className="a-btn a-btn-primary add-submit-btn" disabled={loading}>
+              {loading ? 'Adding…' : '➕ Add Product'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

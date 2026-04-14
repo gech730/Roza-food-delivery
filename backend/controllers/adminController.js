@@ -2,6 +2,9 @@ import adminModel from "../models/adminModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import fs from "fs";
+import orderModel from "../models/orderModel.js";
+import userModel from "../models/userModel.js";
+import foodModel from "../models/foodModel.js";
 
 const adminLogin = async (req, res) => {
   try {
@@ -80,8 +83,8 @@ const adminRegister = async (req, res) => {
       token,
       message: "Admin registered successfully",
       admin: {
-        name: admin.name,
-        email: admin.email,
+        name: newAdmin.name,
+        email: newAdmin.email,
         profileImage: newAdmin.profileImage,
       },
     });
@@ -213,10 +216,58 @@ const changeAdminPassword = async (req, res) => {
   }
 };
 
+const getDashboardStats = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [
+      totalOrders,
+      totalUsers,
+      totalFoods,
+      monthOrders,
+      revenueAgg,
+      monthRevenueAgg,
+      recentOrders,
+      ordersByStatus,
+    ] = await Promise.all([
+      orderModel.countDocuments(),
+      userModel.countDocuments(),
+      foodModel.countDocuments(),
+      orderModel.countDocuments({ createdAt: { $gte: startOfMonth } }),
+      orderModel.aggregate([{ $group: { _id: null, total: { $sum: "$totalPrice" } } }]),
+      orderModel.aggregate([
+        { $match: { createdAt: { $gte: startOfMonth } } },
+        { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+      ]),
+      orderModel.find().sort({ createdAt: -1 }).limit(5),
+      orderModel.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalOrders,
+        totalUsers,
+        totalFoods,
+        monthOrders,
+        totalRevenue: revenueAgg[0]?.total || 0,
+        monthRevenue: monthRevenueAgg[0]?.total || 0,
+        recentOrders,
+        ordersByStatus,
+      },
+    });
+  } catch (error) {
+    console.log("Dashboard stats error:", error);
+    res.json({ success: false, message: "Error fetching stats" });
+  }
+};
+
 export {
   adminLogin,
   adminRegister,
   getAdminProfile,
   updateAdminProfile,
   changeAdminPassword,
+  getDashboardStats,
 };

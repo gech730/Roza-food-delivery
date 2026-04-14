@@ -77,10 +77,7 @@ const getCart = async (req, res) => {
     }
 
     let cartData = userData.cartData;
-    if (Object.keys(cartData).length === 0) {
-      return res.json({ success: false, message: "cart is empty" });
-    }
-    res.json({ success: true, cartData });
+    res.json({ success: true, cartData: cartData || {} });
   } catch (error) {
     console.log(error);
     return res.json({ success: false, message: error });

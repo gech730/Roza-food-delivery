@@ -120,8 +120,16 @@ const userOrders = async (req, res) => {
 
 const listOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({}).sort({ createdAt: -1 });
-    res.json({ success: true, data: orders });
+    const { page = 1, limit = 20, status } = req.query;
+    const filter = status ? { status } : {};
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [orders, total] = await Promise.all([
+      orderModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+      orderModel.countDocuments(filter),
+    ]);
+
+    res.json({ success: true, data: orders, total, page: Number(page) });
   } catch (error) {
     console.log("List orders error:", error);
     res.json({ success: false, message: "Error fetching orders" });

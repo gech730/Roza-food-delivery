@@ -1,42 +1,53 @@
-import React from 'react'
-import './Footer.css'
-import { assets } from '../../assets/assets'
-function Footer() {
-  return (
-    <div className='footer' id='footer'>
-        <div className="footer-content">
-            <div className="div footer-content-left">
-                <img src={assets.logo} alt="" />
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse pariatur quam quibusdam ipsum? Quo voluptas ut aspernatur voluptatum explicabo dolores possimus veritatis, quos non delectus repellendus aliquam sed fugit magnam!</p>
-                <div className="footer-social-icon">
-                <img src={assets.facebook_icon} alt="" />
-                <img src={assets.twitter_icon} alt="" />
-                <img src={assets.linkedin_icon} alt="" />
-            </div>
+import React from 'react';
+import './Footer.css';
+import { assets } from '../../assets/assets';
+import { Link } from 'react-router-dom';
 
-            </div>
-            <div className="footer-content-center">
-            <h2>COMPANY</h2>
-            <ul>
-                <li>Home</li>
-                <li>About us</li>
-                <li> Delivery</li>
-                <li>Privacy policy</li>
-            </ul>
-            </div>
-            <div className="footer-content-right">
-            <h2>GET IN TOUCH</h2>
-            <ul>
-                <li>o970143109</li>
-                <li>tomato@gmail.com</li>
-            </ul>
-            </div>
+const Footer = () => (
+  <footer className='footer' id='footer'>
+    <div className="footer-top">
+      <div className="footer-brand">
+        <div className="footer-logo">
+          <div className="footer-logo-icon">🍛</div>
+          <div>
+            <span className="footer-logo-name">Roza Fast Food</span>
+            <span className="footer-logo-tagline">Authentic Ethiopian Cuisine</span>
+          </div>
         </div>
-        <hr />
-        <p className='footer-copyright'>copyright 2025@Tomato.com -All rights Reserved</p>
-    </div>
-   
-  )
-}
+        <p>Bringing the rich, bold flavors of Ethiopia to your doorstep. Made fresh, delivered fast.</p>
+        <div className="footer-social">
+          <a href="#" aria-label="Facebook"><img src={assets.facebook_icon} alt="Facebook" /></a>
+          <a href="#" aria-label="Twitter"><img src={assets.twitter_icon} alt="Twitter" /></a>
+          <a href="#" aria-label="LinkedIn"><img src={assets.linkedin_icon} alt="LinkedIn" /></a>
+        </div>
+      </div>
 
-export default Footer
+      <div className="footer-links">
+        <h4>Company</h4>
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><a href="#explorer-menu">Menu</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <div className="footer-links">
+        <h4>Get in Touch</h4>
+        <ul>
+          <li>📞 +251 970 143 109</li>
+          <li>✉️ hello@rozafastfood.com</li>
+          <li>📍 Addis Ababa, Ethiopia</li>
+          <li>🕐 Open: 8AM – 10PM</li>
+        </ul>
+      </div>
+    </div>
+
+    <div className="footer-bottom">
+      <p>© 2025 Roza Fast Food. All rights reserved.</p>
+      <p>Made with ❤️ in Ethiopia</p>
+    </div>
+  </footer>
+);
+
+export default Footer;

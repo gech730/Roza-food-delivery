@@ -99,7 +99,11 @@ const orderSchema=new mongoose.Schema({
     chapa_verify_data: {
       type: Object,
     },
-}, { timestamps: true   }
-);
-const orderModel= mongoose.models.orderModel || mongoose.model("orderModel",orderSchema);
+}, { timestamps: true });
+
+// Indexes for query performance
+orderSchema.index({ userId: 1, createdAt: -1 });
+orderSchema.index({ status: 1 });
+
+const orderModel = mongoose.models.orderModel || mongoose.model("orderModel", orderSchema);
 export default orderModel;

@@ -14,34 +14,26 @@ const Verify = () => {
     const tx_ref = params.get("tx_ref");
 
     if (!tx_ref) {
-      console.error("tx_ref not found in URL");
+      setStatus("failed");
+      setLoading(false);
       return;
     }
 
     const verifyPayment = async () => {
       try {
         const response = await axios.get(`${url}/api/order/verify/${tx_ref}`);
-
-        console.log("Verification result:", response.data);
         if (response.data?.status === "success") {
           setStatus("success");
-          // Clear cart from frontend state and localStorage
           setCartItems({});
           localStorage.removeItem("cartItems");
-          setTimeout(() => {
-            navigate("/myOrders");
-          }, 2000);
+          setTimeout(() => navigate("/myOrders"), 2000);
         } else {
           setStatus("failed");
         }
-      } catch (error) {
-        console.error(
-          "Verification error:",
-          error.response?.data || error.message,
-        );
+      } catch {
         setStatus("failed");
       } finally {
-        setLoading(false); // ✅ stop spinner
+        setLoading(false);
       }
     };
 
@@ -51,18 +43,17 @@ const Verify = () => {
   if (loading) {
     return (
       <div className="verify">
-        <div className="spinner"></div>
-        <h2>Verifying payment...</h2>
+        <div className="spinner" />
+        <h2>Verifying your payment...</h2>
+        <p>Please wait, do not close this page.</p>
       </div>
     );
   }
   return (
-    <div>
-      {status === "success" ? (
-        <h2>✅ Payment Successful</h2>
-      ) : (
-        <h2>❌ Payment Failed</h2>
-      )}
+    <div className={`verify ${status === "success" ? "verify-success" : "verify-failed"}`}>
+      <div className="verify-icon">{status === "success" ? "✅" : "❌"}</div>
+      <h2>{status === "success" ? "Payment Successful!" : "Payment Failed"}</h2>
+      <p>{status === "success" ? "Redirecting to your orders..." : "Something went wrong. Please try again."}</p>
     </div>
   );
 };

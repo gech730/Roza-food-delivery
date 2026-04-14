@@ -2,7 +2,6 @@ import React, { useState, useContext, useRef } from 'react';
 import { StoreContext } from '../../context/StoreContext';
 import './Profile.css';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 
 /**
  * User Profile Component

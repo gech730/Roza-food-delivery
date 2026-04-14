@@ -247,5 +247,48 @@ export {
   register,
   getUserProfile,
   updateUserProfile,
-  changePassword
+  changePassword,
+  listUsers,
+  blockUser,
+  deleteUser,
 };
+
+// Admin: list all users with pagination
+async function listUsers(req, res) {
+  try {
+    const { page = 1, limit = 20, search } = req.query;
+    const filter = search
+      ? { $or: [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }] }
+      : {};
+    const skip = (Number(page) - 1) * Number(limit);
+    const [users, total] = await Promise.all([
+      userModel.find(filter).select('-password').sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+      userModel.countDocuments(filter),
+    ]);
+    res.json({ success: true, data: users, total, page: Number(page) });
+  } catch (error) {
+    res.json({ success: false, message: 'Error fetching users' });
+  }
+}
+
+// Admin: block/unblock user
+async function blockUser(req, res) {
+  try {
+    const { userId, blocked } = req.body;
+    await userModel.findByIdAndUpdate(userId, { isBlocked: blocked });
+    res.json({ success: true, message: blocked ? 'User blocked' : 'User unblocked' });
+  } catch (error) {
+    res.json({ success: false, message: 'Error updating user' });
+  }
+}
+
+// Admin: delete user
+async function deleteUser(req, res) {
+  try {
+    const { userId } = req.body;
+    await userModel.findByIdAndDelete(userId);
+    res.json({ success: true, message: 'User deleted' });
+  } catch (error) {
+    res.json({ success: false, message: 'Error deleting user' });
+  }
+}

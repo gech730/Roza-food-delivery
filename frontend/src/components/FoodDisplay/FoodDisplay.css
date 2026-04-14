@@ -1,14 +1,30 @@
-.food-display{
-    margin-top: 30px;
+.food-display { margin-top: 48px; }
 
+.food-display-header { margin-bottom: 28px; }
+.food-display-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--brand-gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
 }
-.food-display h2{
-    font-size: max(2vw,24px);
-    font-weight: 600;
+.food-display-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 2.5vw, 30px); font-weight: 700; color: var(--text-primary);
 }
-.food-display-list{
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
-    margin-top: 30px;
-    gap: 30px; 
+
+.food-display-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.food-display-empty {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.food-display-empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+.food-display-empty p { font-size: 15px; }
+
+@media (max-width: 600px) {
+  .food-display-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+@media (max-width: 380px) {
+  .food-display-grid { grid-template-columns: 1fr; }
 }

@@ -5,38 +5,26 @@ import adminModel from "./models/adminModel.js";
 
 dotenv.config();
 
-
- // Creates a default admin account if none exists
- 
-
 const seedAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
 
-    // Check if admin already exists
-    const adminExists = await adminModel.findOne({ email: "admin@foodsdelivery.com" });
-    
-    if (adminExists) {
-      console.log("Admin account already exists");
-    } else {
-      // Create default admin account
-      const hashedPassword = await bcrypt.hash("admin1234", 10);
-      
-      const admin = new adminModel({
-        name: "Admin",
-        email: "admin@fooddelivery.com",
-        password: hashedPassword,
-      });
+    // Always recreate admin with the correct password
+    await adminModel.deleteOne({ email: "admin@fooddelivery.com" });
 
-      await admin.save();
-      console.log("Default admin account created!");
-      console.log("Email: admin@fooddelivery.com");
-      console.log("Password: admin123");
-    }
+    const hashedPassword = await bcrypt.hash("admin123", 10);
+    await adminModel.create({
+      name: "Admin",
+      email: "admin@fooddelivery.com",
+      password: hashedPassword,
+    });
+
+    console.log("Admin account ready!");
+    console.log("Email:    admin@fooddelivery.com");
+    console.log("Password: admin123");
 
     await mongoose.disconnect();
-    console.log("Disconnected from MongoDB");
     process.exit(0);
   } catch (error) {
     console.error("Error seeding admin:", error);

@@ -25,14 +25,22 @@ const addFood = async (req, res) => {
 
 /**
  * Get All Food Items
- * Retrieves all food items from database
+ * Supports optional ?category= and ?search= query params
  */
 const readFood = async (req, res) => {
   try {
-    const foods = await food_list.find({});
-    if (!foods)
-      return res.status(404).json({ success: false, message: "No food items found" });
-    res.status(200).json({ success: true, data: foods });
+    const { category, search, page = 1, limit = 50 } = req.query;
+    const filter = {};
+    if (category && category !== "All") filter.category = category;
+    if (search) filter.name = { $regex: search, $options: "i" };
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const [foods, total] = await Promise.all([
+      food_list.find(filter).skip(skip).limit(Number(limit)),
+      food_list.countDocuments(filter),
+    ]);
+
+    res.status(200).json({ success: true, data: foods, total, page: Number(page) });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

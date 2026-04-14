@@ -1,5 +1,7 @@
-import React, { useState, useContext } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navarbar from './components/Navbar/Navarbar.jsx';
 import Home from './pages/Home/Home.jsx';
 import Cart from './pages/Cart/Cart.jsx';
@@ -15,22 +17,29 @@ const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { token } = useContext(StoreContext);
 
+  // Protected route — redirects to home and opens login if not authenticated
+  const Protected = ({ children }) => {
+    if (!token) {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
+
   return (
     <>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
-      
+
       <div className='app'>
         <Navarbar setShowLogin={setShowLogin} />
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/cart' element={<Cart />} />
-          <Route path='/order' element={<PlaceOrder />} />
-          <Route path='/verify' element={<Verify />} />
-          <Route path='/myOrders' element={<UserOrder />} />
-          <Route 
-            path='/profile' 
-            element={token ? <Profile /> : <Home />} 
-          />
+          <Route path='/order'    element={<Protected><PlaceOrder /></Protected>} />
+          <Route path='/verify'   element={<Verify />} />
+          <Route path='/myOrders' element={<Protected><UserOrder /></Protected>} />
+          <Route path='/profile'  element={<Protected><Profile /></Protected>} />
+          <Route path='*' element={<Navigate to="/" replace />} />
         </Routes>
         <Footer />
       </div>

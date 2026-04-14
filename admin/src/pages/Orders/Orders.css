@@ -1,152 +1,23 @@
-.order-item {
-  display: grid;
-  grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
-  align-items: start;
-  gap: 30px;
-  border: 1px solid #e0e0e0;
-  padding: 20px;
-  margin: 30px 0px;
-  font-size: 14px;
-  color: #505050;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.order-item img {
-  width: 50px;
-}
-
-.order-details {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.order-item-food,
-.order-item-name {
-  font-weight: 600;
-}
-
-.order-item-name {
-  margin-top: 15px;
-  margin-bottom: 5px;
-}
-
-.order-item-address {
-  margin-bottom: 10px;
-}
-
-.order-item-address p {
-  margin: 2px 0;
-}
-
-.order-item-phone {
-  color: #666;
-}
-
-.order-date {
-  font-size: 12px;
-  color: #888;
-  margin-top: 5px;
-}
-
-.order-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.order-amount {
-  font-weight: 700;
-  font-size: 18px;
-  color: #333;
-}
-
-.payment-status {
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.payment-status.paid {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.payment-status.pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-/* Status Select Styles */
-.order-item select {
-  background-color: #ffe8c4;
-  border: 1px solid #ff9800;
-  padding: 10px;
-  border-radius: 5px;
-  width: 150px;
-  outline: none;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-/* Status-specific colors */
-.status-select.status-pending {
-  background-color: #fff3cd;
-  border-color: #ffc107;
-}
-
-.status-select.status-confirmed {
-  background-color: #cce5ff;
-  border-color: #007bff;
-}
-
-.status-select.status-preparing {
-  background-color: #d1ecf1;
-  border-color: #17a2b8;
-}
-
-.status-select.status-out-for-delivery {
-  background-color: #e2e3e5;
-  border-color: #6c757d;
-}
-
-.status-select.status-delivered {
-  background-color: #d4edda;
-  border-color: #28a745;
-}
-
-.status-select.status-cancelled {
-  background-color: #f8d7da;
-  border-color: #dc3545;
-}
-
-.no-orders {
-  text-align: center;
-  padding: 40px;
-  color: #888;
-  font-size: 18px;
-}
-
-@media (max-width: 1000px) {
-  .order-item {
-    font-size: 12px;
-    grid-template-columns: 0.5fr 2fr 1fr;
-    padding: 15px 8px;
-  }
-  
-  .order-item select {
-    padding: 5px;
-    font-size: 12px;
-  }
-  
-  .order-item img {
-    width: 40px;
-  }
-  
-  .order-summary {
-    display: none;
-  }
+﻿.orders-toolbar{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;margin-bottom:16px;flex-wrap:wrap;}
+.orders-filters{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.orders-table-wrap{overflow-x:auto;margin-bottom:16px;}
+.orders-empty{padding:48px;text-align:center;color:var(--muted);font-size:15px;}
+.order-id-btn{background:none;border:none;cursor:pointer;font-size:13px;font-weight:700;color:var(--brand);padding:0;white-space:nowrap;}
+.order-customer{display:flex;flex-direction:column;gap:2px;}
+.order-customer strong{font-size:13px;color:var(--text);}
+.order-customer span{font-size:11px;color:var(--muted);}
+.order-status-select{border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;font-size:12px;background:var(--surface);color:var(--text);cursor:pointer;width:auto;}
+.order-row-expanded td{background:var(--brand-light)!important;}
+.order-detail-row td{padding:0!important;}
+.order-detail{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:16px 20px;background:var(--surface2);border-top:2px solid var(--brand);}
+.order-detail h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.order-detail-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);}
+.order-detail-item img{width:36px;height:36px;border-radius:6px;object-fit:cover;}
+.order-detail-item span:nth-child(2){flex:1;}
+.order-detail-addr p{font-size:13px;color:var(--text2);margin-bottom:5px;}
+@media(max-width:768px){
+  .order-detail{grid-template-columns:1fr;}
+  .orders-toolbar{flex-direction:column;}
+  .a-table th:nth-child(3),.a-table td:nth-child(3),
+  .a-table th:nth-child(7),.a-table td:nth-child(7){display:none;}
 }

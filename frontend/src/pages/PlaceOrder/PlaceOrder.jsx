@@ -2,19 +2,15 @@ import React, { useContext, useState } from "react";
 import "./PlaceOrder.css";
 import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
+import { toast } from "react-toastify";
 
 function PlaceOrder() {
   const { url, getTotalCartAmount, cartItems, food_list, token } = useContext(StoreContext);
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    region: "",
-    postalCode: "",
+    firstName: "", lastName: "", email: "",
+    phone: "", address: "", city: "", region: "", postalCode: "",
   });
 
   const onChangeHandler = (event) => {
@@ -25,48 +21,50 @@ function PlaceOrder() {
   const placeOrder = async (event) => {
     event.preventDefault();
 
-    // Build items array from cart
+    if (!token) return toast.error("Please sign in first");
+
     const items = Object.entries(cartItems)
       .filter(([, qty]) => qty > 0)
       .map(([itemId, quantity]) => {
         const food = food_list.find((f) => f._id === itemId);
-        return {
-          productId: itemId,
-          name: food.name,
-          price: food.price,
-          quantity,
-          image: food.image,
-        };
-      });
+        if (!food) return null;
+        return { productId: itemId, name: food.name, price: food.price, quantity, image: food.image };
+      })
+      .filter(Boolean);
+
+    if (items.length === 0) return toast.error("Your cart is empty");
 
     const itemsPrice = getTotalCartAmount();
-    const deliveryFee = itemsPrice === 0 ? 0 : 2;
+    const deliveryFee = 2;
     const totalAmount = itemsPrice + deliveryFee;
 
-    const res = await axios.post(
-      url + "/api/order/initialize",
-      {
-        amount: totalAmount,
-        email: data.email,
-        first_name: data.firstName,
-        last_name: data.lastName,
-        phone_number: data.phone,
-        items,
-        itemsPrice,
-        deliveryFee,
-        address: {
-          fullName: `${data.firstName} ${data.lastName}`,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          region: data.region,
-          postalCode: data.postalCode,
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        url + "/api/order/initialize",
+        {
+          amount: totalAmount, email: data.email,
+          first_name: data.firstName, last_name: data.lastName,
+          phone_number: data.phone, items, itemsPrice, deliveryFee,
+          address: {
+            fullName: `${data.firstName} ${data.lastName}`,
+            phone: data.phone, address: data.address,
+            city: data.city, region: data.region, postalCode: data.postalCode,
+          },
         },
-      },
-      { headers: { token, "Content-Type": "application/json" } }
-    );
+        { headers: { token, "Content-Type": "application/json" } }
+      );
 
-    window.location.href = res.data.checkout_url;
+      if (res.data.checkout_url) {
+        window.location.href = res.data.checkout_url;
+      } else {
+        toast.error(res.data.error || "Payment initialization failed");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,7 +104,9 @@ function PlaceOrder() {
               <p>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</p>
             </div>
           </div>
-          <button type="submit">PROCEED TO PAYMENT</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Processing…" : "PROCEED TO PAYMENT"}
+          </button>
         </div>
       </div>
     </form>

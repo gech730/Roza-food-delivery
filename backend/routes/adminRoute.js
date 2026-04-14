@@ -4,9 +4,9 @@ import {
   adminRegister, 
   getAdminProfile,
   updateAdminProfile,
-  changeAdminPassword 
+  changeAdminPassword,
+  getDashboardStats,
 } from "../controllers/adminController.js";
-
 import adminAuthMiddleware from "../middleware/adminAuth.js";
 import multer from "multer";
 
@@ -51,5 +51,8 @@ adminRouter.post("/update", adminAuthMiddleware, upload.single("profileImage"), 
 
 // POST /api/admin/password 
 adminRouter.post("/password", adminAuthMiddleware, changeAdminPassword);
+
+// GET /api/admin/dashboard - Analytics stats
+adminRouter.get("/dashboard", adminAuthMiddleware, getDashboardStats);
 
 export default adminRouter;
