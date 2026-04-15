@@ -1,27 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
-const STATUS_COLOR = {
-  pending:'#f59e0b', paid:'#3b82f6', preparing:'#f97316',
-  out_for_delivery:'#8b5cf6', delivered:'#22c55e', cancelled:'#ef4444',
+const STATUS_META = {
+  pending:          { color: '#f59e0b', bg: '#fffbeb', label: 'Pending' },
+  paid:             { color: '#3b82f6', bg: '#eff6ff', label: 'Confirmed' },
+  preparing:        { color: '#f97316', bg: '#fff7ed', label: 'Preparing' },
+  out_for_delivery: { color: '#8b5cf6', bg: '#f5f3ff', label: 'On the Way' },
+  delivered:        { color: '#22c55e', bg: '#f0fdf4', label: 'Delivered' },
+  cancelled:        { color: '#ef4444', bg: '#fef2f2', label: 'Cancelled' },
 };
 
-const StatCard = ({ icon, label, value, sub, color }) => (
-  <div className="dash-stat" style={{ borderLeft: `4px solid ${color}` }}>
-    <div className="dash-stat-icon" style={{ background: color + '18' }}>{icon}</div>
-    <div className="dash-stat-body">
-      <p className="dash-stat-label">{label}</p>
-      <p className="dash-stat-value">{value}</p>
-      {sub && <p className="dash-stat-sub">{sub}</p>}
+const fmt = (n) => new Intl.NumberFormat().format(n ?? 0);
+const fmtMoney = (n) => `$${(n ?? 0).toFixed(2)}`;
+
+// ── Stat Card ──────────────────────────────────────────────────────────────────
+const StatCard = ({ icon, label, value, sub, subPositive, accent, fillPct = 65 }) => (
+  <div className="ds-stat">
+    <div className="ds-stat-top">
+      <div className="ds-stat-icon" style={{ background: accent + '18', color: accent }}>
+        {icon}
+      </div>
+      <div className="ds-stat-info">
+        <span className="ds-stat-label">{label}</span>
+        <span className="ds-stat-value">{value}</span>
+      </div>
+    </div>
+    {sub && (
+      <div className={`ds-stat-sub ${subPositive ? 'positive' : ''}`}>
+        <span>{subPositive ? '↑' : '→'}</span> {sub}
+      </div>
+    )}
+    <div className="ds-stat-bar" style={{ background: accent + '18' }}>
+      <div className="ds-stat-bar-fill" style={{ background: accent, width: `${fillPct}%` }} />
     </div>
   </div>
 );
 
+// ── Dashboard ──────────────────────────────────────────────────────────────────
 const Dashboard = ({ url, token }) => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats]   = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get(`${url}/api/admin/dashboard`, { headers: { token } })
@@ -30,70 +52,229 @@ const Dashboard = ({ url, token }) => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="a-spinner-wrap"><div className="a-spinner" /></div>;
-  if (!stats)  return <p style={{ color: 'var(--muted)' }}>No data.</p>;
+  if (loading) return (
+    <div className="ds-loading">
+      <div className="ds-loading-inner">
+        <div className="a-spinner" />
+        <p>Loading dashboard…</p>
+      </div>
+    </div>
+  );
+
+  if (!stats) return (
+    <div className="ds-empty">
+      <span>📊</span>
+      <p>No data available yet.</p>
+    </div>
+  );
+
+  const totalOrders = stats.totalOrders || 0;
 
   return (
-    <div className="dashboard" style={{ animation: 'fadeIn .4s' }}>
-      <div className="a-page-header">
-        <div><h1>Dashboard</h1><p>Welcome back — here's what's happening today.</p></div>
+    <div className="dashboard">
+
+      {/* ── Header ── */}
+      <div className="ds-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Welcome back — here's your restaurant overview.</p>
+        </div>
+        <div className="ds-header-date">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="dash-stats-grid">
-        <StatCard icon="📦" label="Total Orders"   value={stats.totalOrders}                    sub={`+${stats.monthOrders} this month`} color="#f97316" />
-        <StatCard icon="💰" label="Total Revenue"  value={`$${stats.totalRevenue?.toFixed(2)}`} sub={`$${stats.monthRevenue?.toFixed(2)} this month`} color="#22c55e" />
-        <StatCard icon="👥" label="Total Users"    value={stats.totalUsers}                     color="#3b82f6" />
-        <StatCard icon="🍽️" label="Menu Items"    value={stats.totalFoods}                     color="#8b5cf6" />
+      {/* ── Stat Cards ── */}
+      <div className="ds-stats">
+        <StatCard
+          icon="📦" label="Total Orders" value={fmt(stats.totalOrders)}
+          sub={`+${stats.monthOrders} this month`} subPositive
+          accent="#f97316"
+          fillPct={Math.min(100, totalOrders > 0 ? (stats.monthOrders / totalOrders) * 100 * 3 : 40)}
+        />
+        <StatCard
+          icon="💰" label="Total Revenue" value={fmtMoney(stats.totalRevenue)}
+          sub={`${fmtMoney(stats.monthRevenue)} this month`} subPositive
+          accent="#22c55e"
+          fillPct={Math.min(100, stats.totalRevenue > 0 ? (stats.monthRevenue / stats.totalRevenue) * 100 * 3 : 40)}
+        />
+        <StatCard
+          icon="👥" label="Registered Users" value={fmt(stats.totalUsers)}
+          accent="#3b82f6" fillPct={72}
+        />
+        <StatCard
+          icon="🍽️" label="Menu Items" value={fmt(stats.totalFoods)}
+          accent="#8b5cf6" fillPct={55}
+        />
       </div>
 
-      <div className="dash-bottom-grid">
-        {/* Orders by status */}
-        <div className="a-card dash-status-card">
-          <h3 className="dash-section-title">Orders by Status</h3>
-          <div className="dash-status-list">
-            {stats.ordersByStatus.length === 0 && <p style={{ color: 'var(--muted)', fontSize: 13 }}>No orders yet.</p>}
-            {stats.ordersByStatus.map(s => (
-              <div key={s._id} className="dash-status-row">
-                <span className="dash-status-dot" style={{ background: STATUS_COLOR[s._id] || '#aaa' }} />
-                <span className="dash-status-name">{s._id?.replace(/_/g, ' ')}</span>
-                <div className="dash-status-bar-wrap">
-                  <div className="dash-status-bar" style={{ width: `${Math.min((s.count / stats.totalOrders) * 100, 100)}%`, background: STATUS_COLOR[s._id] || '#aaa' }} />
-                </div>
-                <span className="dash-status-count">{s.count}</span>
-              </div>
-            ))}
+      {/* ── Middle row ── */}
+      <div className="ds-mid">
+
+        {/* Order Status Breakdown */}
+        <div className="a-card ds-card">
+          <div className="ds-card-header">
+            <h3>Order Status</h3>
+            <button className="ds-link" onClick={() => navigate('/orders')}>View all →</button>
+          </div>
+          {stats.ordersByStatus.length === 0 ? (
+            <p className="ds-empty-text">No orders yet.</p>
+          ) : (
+            <div className="ds-status-list">
+              {stats.ordersByStatus
+                .sort((a, b) => b.count - a.count)
+                .map(s => {
+                  const meta = STATUS_META[s._id] || { color: '#aaa', bg: '#f5f5f5', label: s._id };
+                  const pct  = totalOrders > 0 ? Math.round((s.count / totalOrders) * 100) : 0;
+                  return (
+                    <div key={s._id} className="ds-status-item">
+                      <div className="ds-status-top">
+                        <div className="ds-status-left">
+                          <span className="ds-status-dot" style={{ background: meta.color }} />
+                          <span className="ds-status-label">{meta.label}</span>
+                        </div>
+                        <div className="ds-status-right">
+                          <span className="ds-status-count">{s.count}</span>
+                          <span className="ds-status-pct">{pct}%</span>
+                        </div>
+                      </div>
+                      <div className="ds-progress-track">
+                        <div
+                          className="ds-progress-fill"
+                          style={{ width: `${pct}%`, background: meta.color }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+        </div>
+
+        {/* Revenue Summary */}
+        <div className="a-card ds-card ds-revenue-card">
+          <div className="ds-card-header">
+            <h3>Revenue Summary</h3>
+          </div>
+          <div className="ds-revenue-grid">
+            <div className="ds-rev-item">
+              <span className="ds-rev-label">Total Revenue</span>
+              <span className="ds-rev-value" style={{ color: '#22c55e' }}>{fmtMoney(stats.totalRevenue)}</span>
+            </div>
+            <div className="ds-rev-item">
+              <span className="ds-rev-label">This Month</span>
+              <span className="ds-rev-value" style={{ color: '#3b82f6' }}>{fmtMoney(stats.monthRevenue)}</span>
+            </div>
+            <div className="ds-rev-item">
+              <span className="ds-rev-label">Total Orders</span>
+              <span className="ds-rev-value">{fmt(stats.totalOrders)}</span>
+            </div>
+            <div className="ds-rev-item">
+              <span className="ds-rev-label">This Month</span>
+              <span className="ds-rev-value">{fmt(stats.monthOrders)}</span>
+            </div>
+            <div className="ds-rev-item">
+              <span className="ds-rev-label">Avg. Order Value</span>
+              <span className="ds-rev-value" style={{ color: '#f97316' }}>
+                {totalOrders > 0 ? fmtMoney(stats.totalRevenue / totalOrders) : '$0.00'}
+              </span>
+            </div>
+            <div className="ds-rev-item">
+              <span className="ds-rev-label">Delivery Rate</span>
+              <span className="ds-rev-value" style={{ color: '#22c55e' }}>
+                {totalOrders > 0
+                  ? `${Math.round(((stats.ordersByStatus.find(s => s._id === 'delivered')?.count || 0) / totalOrders) * 100)}%`
+                  : '0%'}
+              </span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Recent orders */}
-        <div className="a-card dash-recent-card">
-          <h3 className="dash-section-title">Recent Orders</h3>
-          {stats.recentOrders.length === 0
-            ? <p style={{ color: 'var(--muted)', fontSize: 13 }}>No recent orders.</p>
-            : (
-              <table className="a-table">
-                <thead><tr><th>Order</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
-                <tbody>
-                  {stats.recentOrders.map(o => (
+      {/* ── Recent Orders ── */}
+      <div className="a-card ds-card ds-recent">
+        <div className="ds-card-header">
+          <h3>Recent Orders</h3>
+          <button className="ds-link" onClick={() => navigate('/orders')}>View all →</button>
+        </div>
+
+        {stats.recentOrders.length === 0 ? (
+          <p className="ds-empty-text">No orders yet.</p>
+        ) : (
+          <>
+            {/* Desktop table */}
+            <table className="a-table ds-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recentOrders.map(o => {
+                  const meta = STATUS_META[o.status] || { color: '#aaa', bg: '#f5f5f5', label: o.status };
+                  return (
                     <tr key={o._id}>
-                      <td><strong>#{o._id.slice(-6).toUpperCase()}</strong></td>
-                      <td>{o.items.length} item{o.items.length !== 1 ? 's' : ''}</td>
-                      <td style={{ color: 'var(--brand)', fontWeight: 700 }}>${o.totalPrice}</td>
                       <td>
-                        <span className="a-badge" style={{ background: (STATUS_COLOR[o.status] || '#aaa') + '18', color: STATUS_COLOR[o.status] || '#aaa' }}>
-                          {o.status?.replace(/_/g, ' ')}
+                        <span className="ds-order-id">#{o._id.slice(-7).toUpperCase()}</span>
+                      </td>
+                      <td>
+                        <div className="ds-customer">
+                          <div className="ds-avatar">
+                            {(o.shippingAddress?.fullName?.[0] || '?').toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="ds-customer-name">{o.shippingAddress?.fullName || '—'}</div>
+                            <div className="ds-customer-phone">{o.shippingAddress?.phone || ''}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{o.items?.length} item{o.items?.length !== 1 ? 's' : ''}</td>
+                      <td><span className="ds-amount">{fmtMoney(o.totalPrice)}</span></td>
+                      <td>
+                        <span className="ds-badge" style={{ background: meta.bg, color: meta.color }}>
+                          {meta.label}
                         </span>
                       </td>
-                      <td>{new Date(o.createdAt).toLocaleDateString()}</td>
+                      <td className="ds-date">
+                        {new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )
-          }
-        </div>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {/* Mobile cards */}
+            <div className="ds-order-cards">
+              {stats.recentOrders.map(o => {
+                const meta = STATUS_META[o.status] || { color: '#aaa', bg: '#f5f5f5', label: o.status };
+                return (
+                  <div key={o._id} className="ds-order-card">
+                    <div className="ds-order-card-top">
+                      <span className="ds-order-id">#{o._id.slice(-7).toUpperCase()}</span>
+                      <span className="ds-badge" style={{ background: meta.bg, color: meta.color }}>{meta.label}</span>
+                    </div>
+                    <div className="ds-order-card-mid">
+                      <span>{o.shippingAddress?.fullName || '—'}</span>
+                      <span className="ds-amount">{fmtMoney(o.totalPrice)}</span>
+                    </div>
+                    <div className="ds-order-card-bot">
+                      <span>{o.items?.length} item{o.items?.length !== 1 ? 's' : ''}</span>
+                      <span className="ds-date">{new Date(o.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
+
     </div>
   );
 };

@@ -11,62 +11,43 @@ const NAV = [
   { to: '/settings',  icon: '⚙️', label: 'Settings' },
 ];
 
-const Sidebar = ({ collapsed, mobileOpen, onToggleCollapse, onCloseMobile }) => {
+const Sidebar = ({ open, onClose }) => {
   const location = useLocation();
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
-      {/* Brand */}
-      <div className="sidebar-brand">
-        <div className="sidebar-brand-icon">🍛</div>
-        {!collapsed && (
-          <div className="sidebar-brand-text">
-            <span className="sidebar-brand-name">Roza</span>
-            <span className="sidebar-brand-sub">Admin Panel</span>
+    <aside className="sidebar">
+      {/* Brand + close button */}
+      <div className="sb-header">
+        <div className="sb-brand">
+          <div className="sb-brand-icon">🍛</div>
+          <div className="sb-brand-text">
+            <span className="sb-brand-name">Roza Admin</span>
+            <span className="sb-brand-sub">Food Delivery</span>
           </div>
-        )}
-        {/* Desktop collapse toggle */}
-        <button
-          className="sidebar-toggle desktop-only"
-          onClick={onToggleCollapse}
-          aria-label="Toggle sidebar"
-          title={collapsed ? 'Expand' : 'Collapse'}
-        >
-          {collapsed ? '›' : '‹'}
-        </button>
-        {/* Mobile close button */}
-        <button
-          className="sidebar-toggle mobile-only"
-          onClick={onCloseMobile}
-          aria-label="Close menu"
-        >
+        </div>
+        {/* ✕ close button — always visible */}
+        <button className="sb-close" onClick={onClose} title="Close sidebar">
           ✕
         </button>
       </div>
 
       {/* Nav links */}
-      <nav className="sidebar-nav">
+      <nav className="sb-nav">
         {NAV.map(({ to, icon, label }) => (
           <NavLink
             key={to}
             to={to}
-            onClick={onCloseMobile}
             className={({ isActive }) =>
-              `sidebar-link${isActive || (to === '/dashboard' && location.pathname === '/') ? ' active' : ''}`
+              `sb-link${isActive || (to === '/dashboard' && location.pathname === '/') ? ' active' : ''}`
             }
-            title={collapsed ? label : undefined}
           >
-            <span className="sidebar-link-icon">{icon}</span>
-            {!collapsed && <span className="sidebar-link-label">{label}</span>}
+            <span className="sb-icon">{icon}</span>
+            <span className="sb-label">{label}</span>
           </NavLink>
         ))}
       </nav>
 
-      {!collapsed && (
-        <div className="sidebar-footer">
-          Roza Fast Food © 2025
-        </div>
-      )}
+      <div className="sb-footer">Roza Fast Food © 2025</div>
     </aside>
   );
 };

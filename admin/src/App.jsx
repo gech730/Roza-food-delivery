@@ -1,25 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import Navbar from './component/Navbar/Navbar';
-import Sidebar from './component/SideBar/Sidebar';
-import Add from './pages/Add/Add';
-import Orders from './pages/Orders/Orders';
-import List from './pages/List/List';
-import Login from './pages/Login/Login';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import Navbar   from './component/Navbar/Navbar';
+import Sidebar  from './component/SideBar/Sidebar';
+import Add      from './pages/Add/Add';
+import Orders   from './pages/Orders/Orders';
+import List     from './pages/List/List';
+import Login    from './pages/Login/Login';
 import Settings from './pages/Settings/Settings';
 import Dashboard from './pages/Dashboard/Dashboard';
-import Users from './pages/Users/Users';
+import Users    from './pages/Users/Users';
 import Payments from './pages/Payments/Payments';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './App.css';
 
 const App = () => {
   const navigate = useNavigate();
-  const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
-  // Desktop: sidebar collapsed to icon-only
-  const [collapsed, setCollapsed] = useState(false);
-  // Mobile: sidebar drawer open
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const [token, setToken]         = useState(localStorage.getItem('adminToken') || '');
+  const [sidebarOpen, setSidebar] = useState(true); // true = visible
   const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
   const handleLogout = () => {
@@ -32,8 +31,10 @@ const App = () => {
     if (token) localStorage.setItem('adminToken', token);
   }, [token]);
 
-  // Close mobile sidebar on route change
-  useEffect(() => { setMobileOpen(false); }, []);
+  // On mobile, close sidebar when route changes
+  useEffect(() => {
+    if (window.innerWidth < 768) setSidebar(false);
+  }, [location.pathname]);
 
   if (!token) return (
     <>
@@ -43,28 +44,26 @@ const App = () => {
   );
 
   return (
-    <div className="admin-layout">
+    <div className={`admin-shell ${sidebarOpen ? 'sidebar-visible' : 'sidebar-hidden'}`}>
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Mobile overlay */}
-      <div
-        className={`sidebar-overlay ${mobileOpen ? 'visible' : ''}`}
-        onClick={() => setMobileOpen(false)}
-      />
-
+      {/* ── Sidebar ── */}
       <Sidebar
-        collapsed={collapsed}
-        mobileOpen={mobileOpen}
-        onToggleCollapse={() => setCollapsed(c => !c)}
-        onCloseMobile={() => setMobileOpen(false)}
+        open={sidebarOpen}
+        onClose={() => setSidebar(false)}
       />
 
+      {/* ── Main area ── */}
       <div className="admin-main">
+
+        {/* Fixed top navbar */}
         <Navbar
           handleLogout={handleLogout}
-          onMobileMenuToggle={() => setMobileOpen(o => !o)}
-          onDesktopToggle={() => setCollapsed(c => !c)}
+          onMenuToggle={() => setSidebar(o => !o)}
+          sidebarOpen={sidebarOpen}
         />
+
+        {/* Scrollable page content */}
         <main className="admin-page">
           <Routes>
             <Route path="/"          element={<Dashboard url={url} token={token} />} />

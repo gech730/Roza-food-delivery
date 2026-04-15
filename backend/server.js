@@ -14,39 +14,47 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Ensure uploads directory exists on fresh deploys
 try { mkdirSync("uploads", { recursive: true }); } catch (_) {}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Security headers
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-
-// CORS
+// CORS must be FIRST — before helmet and all routes
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://roza-frontend.vercel.app",
+  "https://roza-admin.vercel.app",
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-    cb(new Error("Not allowed by CORS"));
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error("Not allowed by CORS: " + origin));
   },
   credentials: true,
-}));
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight for all routes
+
+// Security headers (after CORS)
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 // Body parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// HTTP request logging
+// Logging
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-// Rate limiting - global
+// Rate limiting
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -54,8 +62,6 @@ const globalLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: "Too many requests, please try again later." },
 });
-
-// Rate limiting - auth endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -85,7 +91,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// 404 handler
+// 404
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
