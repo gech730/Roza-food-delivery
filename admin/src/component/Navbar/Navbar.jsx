@@ -14,7 +14,7 @@ import './Navbar.css';
 import { assets } from '../../assets/assets';
 import { useTheme } from '../../context/ThemeContext';
 
-const Navbar = ({ handleLogout, onMenuToggle, sidebarOpen }) => {
+const Navbar = ({ handleLogout, onToggleSidebar, sidebarOpen }) => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
   const [search, setSearch] = useState('');
@@ -25,7 +25,7 @@ const Navbar = ({ handleLogout, onMenuToggle, sidebarOpen }) => {
       {/* Menu toggle */}
       <button 
         className="nb-menu-btn" 
-        onClick={onMenuToggle} 
+        onClick={onToggleSidebar} 
         title={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
       >
         <Menu size={20} />
