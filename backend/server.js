@@ -42,7 +42,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight for all routes
+// Express 5 compatible preflight — handles OPTIONS for all routes
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
 // Security headers (after CORS)
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));

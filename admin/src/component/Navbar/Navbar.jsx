@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, 
@@ -59,7 +59,7 @@ const Navbar = ({ handleLogout, onToggleSidebar, sidebarOpen }) => {
           <span className="nb-dot" />
         </button>
 
-        <div className="nb-sep" />
+        <div className="nb-divider" />
 
         {/* Profile dropdown */}
         <div 
@@ -68,13 +68,12 @@ const Navbar = ({ handleLogout, onToggleSidebar, sidebarOpen }) => {
           onMouseLeave={() => setDropdownOpen(false)}
         >
           <img src={assets.profile_icon} alt="Admin" className="nb-avatar" />
-          <div className="nb-profile-text">
-            <span className="nb-name">Admin</span>
-            <span className="nb-role">Super Admin</span>
+          <div className="nb-profile-info">
+            <span className="nb-profile-name">Roza Admin</span>
+            <span className="nb-profile-role">Superuser</span>
           </div>
           <ChevronDown size={14} className="nb-chevron" />
 
-          {/* Dropdown */}
           <div className="nb-dropdown">
             <div className="nb-drop-header">
               <img src={assets.profile_icon} alt="Admin" className="nb-drop-avatar" />

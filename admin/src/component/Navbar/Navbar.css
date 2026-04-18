@@ -6,11 +6,11 @@
   padding: 0 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  flex-shrink: 0;
+  width: 100%;
+  z-index: 300;
 }
+.navbar-left, .navbar-right { display: flex; align-items: center; gap: 8px; }
+.navbar-brand { font-size: 16px; font-weight: 700; color: var(--text); margin-left: 4px; }
 
 /* Hamburger toggle */
 .nb-menu-btn {
@@ -171,7 +171,6 @@
   transform: rotate(180deg);
 }
 
-/* Dropdown */
 .nb-dropdown {
   position: absolute;
   right: 0;
