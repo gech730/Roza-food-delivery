@@ -17,27 +17,36 @@ import './App.css';
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
+
+  // ── All state declarations first ──────────────────────────────────────────
+  const [token, setToken]           = useState(localStorage.getItem('adminToken') || '');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile]     = useState(window.innerWidth < 768);
+
   const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+  // ── Effects ───────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (token) localStorage.setItem('adminToken', token);
+  }, [token]);
+
+  // Track viewport width
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // Close sidebar on route change when on mobile
+  useEffect(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [location.pathname, isMobile]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     setToken('');
     navigate('/');
   };
-
-  useEffect(() => {
-    if (isMobile) setSidebarOpen(false);
-  }, [location.pathname, isMobile]);
-
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
 
   if (!token) return (
     <>
@@ -50,7 +59,7 @@ const App = () => {
     <div className="ap-root">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* TOP NAVBAR — full width */}
+      {/* NAVBAR — fixed full width at top */}
       <header className="ap-navbar">
         <Navbar
           handleLogout={handleLogout}
@@ -61,13 +70,10 @@ const App = () => {
         />
       </header>
 
-      {/* BOTTOM ROW — sidebar + content side by side */}
+      {/* BODY ROW — sidebar LEFT, content RIGHT */}
       <div className="ap-row">
-
-        {/* SIDEBAR — left */}
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        {/* CONTENT — right */}
         <main className="ap-content">
           <Routes>
             <Route path="/"          element={<Dashboard url={url} token={token} />} />
@@ -83,7 +89,7 @@ const App = () => {
         </main>
       </div>
 
-      {/* Mobile overlay — only when sidebar open on mobile */}
+      {/* Mobile overlay */}
       {sidebarOpen && isMobile && (
         <div className="ap-overlay" onClick={() => setSidebarOpen(false)} />
       )}
