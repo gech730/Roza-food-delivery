@@ -25,7 +25,7 @@ const Navbar = ({ handleLogout, sidebarOpen, onToggleSidebar, url, token }) => {
       {/* Menu toggle */}
       <button 
         className="nb-menu-btn" 
-        onClick={onMenuToggle} 
+        onClick={onMenuToggle} // add functionality onMenuToggle 
         title={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
       >
         <Menu size={20} />
