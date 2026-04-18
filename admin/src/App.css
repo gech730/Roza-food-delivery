@@ -1,73 +1,52 @@
-/* ── Shell: flex row, full viewport ── */
-.admin-shell {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+﻿/* =============================================
+   ADMIN LAYOUT
+   - Navbar: fixed full-width at top
+   - Below navbar: sidebar LEFT + content RIGHT
+   ============================================= */
+
+/* Root fills viewport */
+.ap-root {
+  min-height: 100vh;
   background: var(--bg);
 }
 
-/* ── Sidebar panel ── */
-.admin-shell .sidebar {
-  width: 240px;
-  flex-shrink: 0;
-  transition: width 0.25s ease, opacity 0.2s ease;
-  overflow: hidden;
+/* Navbar: FIXED at top, full width */
+.ap-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--navbar-h);
+  z-index: 300;
+  /* actual styling is in Navbar.css */
 }
 
-/* When sidebar is hidden: collapse to zero width */
-.admin-shell.sidebar-hidden .sidebar {
-  width: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* ── Main: takes remaining space ── */
-.admin-main {
-  flex: 1;
+/* Body row: pushed down by navbar height, fills rest of viewport */
+.ap-row {
   display: flex;
-  flex-direction: column;
-  min-width: 0;
-  height: 100vh;
+  flex-direction: row;
+  height: calc(100vh - var(--navbar-h));
+  margin-top: var(--navbar-h);   /* offset for fixed navbar */
   overflow: hidden;
 }
 
-/* ── Scrollable content ── */
-.admin-page {
+/* Content: fills all width to the RIGHT of sidebar, scrolls */
+.ap-content {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px 28px;
+  padding: 28px 32px;
+  background: var(--bg);
 }
 
-/* ── Mobile: sidebar overlays content ── */
-@media (max-width: 768px) {
-  .admin-shell .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    z-index: 300;
-    width: 240px !important;
-    transform: translateX(-100%);
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transition: transform 0.25s ease;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-  }
-  .admin-shell.sidebar-visible .sidebar {
-    transform: translateX(0);
-  }
-  /* Dim overlay when sidebar open on mobile */
-  .admin-shell.sidebar-visible::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 299;
-  }
-  .admin-page { padding: 16px; }
+/* Mobile overlay */
+.ap-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
 }
 
-@media (max-width: 480px) {
-  .admin-page { padding: 12px; }
-}
+@media (max-width: 900px) { .ap-content { padding: 20px; } }
+@media (max-width: 480px) { .ap-content { padding: 14px; } }

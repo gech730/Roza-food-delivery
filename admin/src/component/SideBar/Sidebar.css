@@ -5,12 +5,23 @@
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;           /* hides content when width collapses */
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* height fills ap-row via flex stretch */
 }
 
-/* Header row: brand + close button */
-.sb-header {
+/* OPEN — full width (default on desktop) */
+.sidebar.open {
+  width: var(--sidebar-w);
+}
+
+/* CLOSED — collapse to zero, content hidden */
+.sidebar.closed {
+  width: 0;
+}
+
+/* ── Header ── */
+.sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,9 +30,10 @@
   min-height: var(--navbar-h);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  width: var(--sidebar-w);   /* fixed width so it doesn't squish during animation */
 }
 
-.sb-brand {
+.sidebar-logo {
   display: flex;
   align-items: center;
   gap: 12px;

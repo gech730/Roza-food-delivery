@@ -5,6 +5,10 @@ import userModel from "../models/userModel.js";
 // Step 1: Initialize payment — save a pending order first, then redirect to Chapa
 const paymentInitialize = async (req, res) => {
   try {
+    if (!process.env.CHAPA_SECRET_KEY) {
+      return res.status(500).json({ error: "CHAPA_SECRET_KEY is not configured on the server" });
+    }
+
     const { amount, email, first_name, last_name, phone_number, address, items, itemsPrice, deliveryFee } = req.body;
     const userId = req.userId;
     const tx_ref = "tx-" + Date.now();
@@ -43,8 +47,12 @@ const paymentInitialize = async (req, res) => {
 
     res.json({ checkout_url: response.data.data.checkout_url, tx_ref });
   } catch (error) {
-    console.log(error.response?.data || error.message);
-    res.status(500).json({ error: "Payment init failed" });
+    const detail = error.response?.data || error.message;
+    console.error("Payment init error:", detail);
+    res.status(500).json({
+      error: "Payment init failed",
+      detail: process.env.NODE_ENV !== "production" ? detail : undefined,
+    });
   }
 };
 
