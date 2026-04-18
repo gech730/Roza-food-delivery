@@ -1,125 +1,204 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { 
+  Search, 
+  CreditCard, 
+  CheckCircle, 
+  Clock, 
+  XCircle,
+  DollarSign,
+  TrendingUp,
+  RefreshCw
+} from 'lucide-react';
 import './Payments.css';
 
 const Payments = ({ url, token }) => {
-  const [orders, setOrders]   = useState([]);
-  const [total, setTotal]     = useState(0);
-  const [page, setPage]       = useState(1);
-  const [filter, setFilter]   = useState('');
+  const [payments, setPayments] = useState([]);
+  const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, failed: 0 });
   const [loading, setLoading] = useState(true);
-  const LIMIT = 20;
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page, limit: LIMIT });
-      const res = await axios.post(`${url}/api/order/list?${params}`, {}, { headers: { token } });
+      const res = await axios.get(`${url}/api/payment/list`, { headers: { token } });
       if (res.data.success) {
-        let data = res.data.data;
-        if (filter === 'paid')    data = data.filter(o => o.isPaid);
-        if (filter === 'pending') data = data.filter(o => !o.isPaid);
-        setOrders(data);
-        setTotal(res.data.total);
+        setPayments(res.data.data || []);
+        // Calculate stats
+        const data = res.data.data || [];
+        const completed = data.filter(p => p.status === 'completed');
+        setStats({
+          total: data.reduce((s, p) => s + (p.amount || 0), 0),
+          completed: completed.length,
+          pending: data.filter(p => p.status === 'pending').length,
+          failed: data.filter(p => p.status === 'failed').length
+        });
       }
-    } catch { toast.error('Failed to fetch payments'); }
-    finally { setLoading(false); }
-  }, [page, filter, url, token]);
+    } catch {
+      // Silent fail - API might not exist
+      setPayments([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [url, token]);
 
-  useEffect(() => { fetchPayments(); }, [fetchPayments]);
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
 
-  const totalRevenue = orders.filter(o => o.isPaid).reduce((s, o) => s + o.totalPrice, 0);
-  const pages = Math.ceil(total / LIMIT);
+  const filtered = payments.filter(p => {
+    if (filter !== 'all' && p.status !== filter) return false;
+    if (search && !p.orderId?.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'completed': return <CheckCircle size={14} />;
+      case 'pending': return <Clock size={14} />;
+      case 'failed': return <XCircle size={14} />;
+      default: return <CreditCard size={14} />;
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'completed': return { background: 'var(--success-bg)', color: 'var(--success)' };
+      case 'pending': return { background: 'var(--warning-bg)', color: 'var(--warning)' };
+      case 'failed': return { background: 'var(--danger-bg)', color: 'var(--danger)' };
+      default: return {};
+    }
+  };
 
   return (
-    <div style={{ animation: 'fadeIn .4s' }}>
+    <div className="payments-page">
+      {/* Header */}
       <div className="a-page-header">
-        <div><h1>Payments</h1><p>All Chapa transactions</p></div>
+        <div>
+          <h1>Payments</h1>
+          <p>Manage payment transactions</p>
+        </div>
+        <button className="a-btn a-btn-ghost" onClick={fetchPayments}>
+          <RefreshCw size={16} />
+          Refresh
+        </button>
       </div>
 
-      {/* Summary cards */}
+      {/* Stats */}
       <div className="pay-summary">
         <div className="a-card pay-stat">
-          <span className="pay-stat-icon">💰</span>
+          <div className="pay-stat-icon" style={{ color: 'var(--brand)' }}>
+            <DollarSign size={28} />
+          </div>
           <div>
-            <p className="pay-stat-label">Revenue (this page)</p>
-            <p className="pay-stat-value">${totalRevenue.toFixed(2)}</p>
+            <p className="pay-stat-label">Total Revenue</p>
+            <p className="pay-stat-value">${stats.total.toLocaleString()}</p>
           </div>
         </div>
         <div className="a-card pay-stat">
-          <span className="pay-stat-icon">✅</span>
+          <div className="pay-stat-icon" style={{ color: 'var(--success)' }}>
+            <CheckCircle size={28} />
+          </div>
           <div>
-            <p className="pay-stat-label">Paid</p>
-            <p className="pay-stat-value">{orders.filter(o => o.isPaid).length}</p>
+            <p className="pay-stat-label">Completed</p>
+            <p className="pay-stat-value">{stats.completed}</p>
           </div>
         </div>
         <div className="a-card pay-stat">
-          <span className="pay-stat-icon">⏳</span>
+          <div className="pay-stat-icon" style={{ color: 'var(--warning)' }}>
+            <Clock size={28} />
+          </div>
           <div>
             <p className="pay-stat-label">Pending</p>
-            <p className="pay-stat-value">{orders.filter(o => !o.isPaid).length}</p>
+            <p className="pay-stat-value">{stats.pending}</p>
           </div>
         </div>
       </div>
 
-      {/* Filter */}
+      {/* Toolbar */}
       <div className="a-card pay-toolbar">
-        {[['', 'All'], ['paid', 'Paid'], ['pending', 'Pending']].map(([val, label]) => (
-          <button key={val} className={`a-btn a-btn-sm ${filter === val ? 'a-btn-primary' : 'a-btn-ghost'}`} onClick={() => { setFilter(val); setPage(1); }}>
-            {label}
-          </button>
-        ))}
+        <div className="a-search">
+          <Search size={16} className="a-search-icon" />
+          <input
+            placeholder="Search by order ID..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="pay-filters">
+          {['all', 'completed', 'pending', 'failed'].map(f => (
+            <button
+              key={f}
+              className={`a-btn a-btn-sm ${filter === f ? 'a-btn-primary' : 'a-btn-ghost'}`}
+              onClick={() => setFilter(f)}
+            >
+              {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* Payments Table */}
       <div className="a-card">
         {loading ? (
-          <div className="a-spinner-wrap"><div className="a-spinner" /></div>
-        ) : orders.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)' }}>💳 No transactions found.</div>
+          <div className="a-spinner-wrap">
+            <div className="a-spinner" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="a-empty">
+            <CreditCard size={48} strokeWidth={1.5} className="a-empty-icon" />
+            <p>No payments found</p>
+          </div>
         ) : (
-          <table className="a-table">
-            <thead>
-              <tr><th>Tx Ref</th><th>Customer</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr>
-            </thead>
-            <tbody>
-              {orders.map(o => (
-                <tr key={o._id}>
-                  <td style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--muted)' }}>{o.tx_ref || '—'}</td>
-                  <td>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>{o.shippingAddress?.fullName || '—'}</div>
-                      <div style={{ fontSize: 11, color: 'var(--muted)' }}>{o.paymentResult?.email}</div>
-                    </div>
-                  </td>
-                  <td style={{ fontWeight: 700, color: 'var(--brand)' }}>${o.totalPrice}</td>
-                  <td>
-                    <span className="a-badge" style={{ background: '#eff6ff', color: '#3b82f6' }}>
-                      {o.paymentMethod || 'Chapa'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="a-badge" style={{ background: o.isPaid ? '#dcfce7' : '#fef9c3', color: o.isPaid ? '#16a34a' : '#ca8a04' }}>
-                      {o.isPaid ? '✓ Paid' : '⏳ Pending'}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: 12, color: 'var(--muted)' }}>
-                    {o.paidAt ? new Date(o.paidAt).toLocaleString() : new Date(o.createdAt).toLocaleDateString()}
-                  </td>
+          <div className="pay-table-wrap">
+            <table className="a-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Method</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map(payment => (
+                  <tr key={payment._id}>
+                    <td>
+                      <span className="pay-order-id">{payment.orderId?.slice(-8) || 'N/A'}</span>
+                    </td>
+                    <td>
+                      <span className="pay-method">{payment.method || 'Card'}</span>
+                    </td>
+                    <td>
+                      <span className="pay-amount">${payment.amount?.toFixed(2) || '0.00'}</span>
+                    </td>
+                    <td>
+                      <span className="a-badge" style={getStatusStyle(payment.status)}>
+                        {getStatusIcon(payment.status)}
+                        {payment.status || 'unknown'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="pay-date">
+                        {payment.createdAt
+                          ? new Date(payment.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })
+                          : 'N/A'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
-
-      {pages > 1 && (
-        <div className="a-pagination">
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-          <span>Page {page} of {pages}</span>
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>Next →</button>
-        </div>
-      )}
     </div>
   );
 };

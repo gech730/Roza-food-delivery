@@ -1,183 +1,300 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useTheme } from '../../context/ThemeContext';
+import { 
+  User, 
+  Lock, 
+  Moon, 
+  Sun, 
+  Save, 
+  X,
+  Camera,
+  Mail,
+  Shield,
+  Loader2
+} from 'lucide-react';
 import './Settings.css';
 
-const Settings = ({ url, token }) => {
-  const { isDarkMode, toggleTheme } = useTheme();
-  const fileInputRef = useRef(null);
+const Settings = ({ url, token, admin, setAdmin, theme, setTheme }) => {
+  const [editMode, setEditMode] = useState(null); // 'profile' | 'password' | null
+  const [form, setForm] = useState({ name: admin?.name || '', email: admin?.email || '' });
+  const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const [adminInfo, setAdminInfo]     = useState(null);
-  const [isEditing, setIsEditing]     = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [showPwForm, setShowPwForm]   = useState(false);
-
-  const [form, setForm] = useState({ name: '', email: '' });
-  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-
-  const fetchProfile = async () => {
-    try {
-      const res = await axios.get(`${url}/api/admin/profile`, { headers: { token } });
-      if (res.data.success) {
-        setAdminInfo(res.data.data);
-        setForm({ name: res.data.data.name || '', email: res.data.data.email || '' });
-      }
-    } catch { /* silent */ }
-  };
-
-  useEffect(() => { fetchProfile(); }, []);
-
-  const handleImageUpload = async (e) => {
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) return toast.error('Images only');
-    if (file.size > 5 * 1024 * 1024) return toast.error('Max 5MB');
-    setIsUploading(true);
+    setUploading(true);
     try {
       const fd = new FormData();
-      fd.append('profileImage', file);
-      const res = await axios.post(`${url}/api/admin/update`, fd, { headers: { token, 'Content-Type': 'multipart/form-data' } });
-      if (res.data.success) { toast.success('Photo updated'); fetchProfile(); }
-      else toast.error(res.data.message);
-    } catch { toast.error('Upload failed'); }
-    finally { setIsUploading(false); }
+      fd.append('avatar', file);
+      const res = await axios.post(`${url}/api/admin/avatar`, fd, { headers: { token } });
+      if (res.data.success) {
+        toast.success('Avatar updated');
+        setAdmin(res.data.admin);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch {
+      toast.error('Failed to upload avatar');
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
+  const saveProfile = async () => {
+    setSaving(true);
     try {
-      const res = await axios.post(`${url}/api/admin/update`, form, { headers: { token } });
-      if (res.data.success) { toast.success('Profile updated'); setIsEditing(false); fetchProfile(); }
-      else toast.error(res.data.message);
-    } catch { toast.error('Update failed'); }
+      const res = await axios.post(`${url}/api/admin/profile`, form, { headers: { token } });
+      if (res.data.success) {
+        toast.success('Profile updated');
+        setAdmin(res.data.admin);
+        setEditMode(null);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch {
+      toast.error('Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    if (pwForm.newPassword !== pwForm.confirmPassword) return toast.error("Passwords don't match");
-    if (pwForm.newPassword.length < 6) return toast.error('Min 6 characters');
+  const changePassword = async () => {
+    if (pwForm.newPw !== pwForm.confirm) {
+      return toast.error('Passwords do not match');
+    }
+    if (pwForm.newPw.length < 6) {
+      return toast.error('Password must be at least 6 characters');
+    }
+    setSaving(true);
     try {
-      const res = await axios.post(`${url}/api/admin/password`, { currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }, { headers: { token } });
+      const res = await axios.post(
+        `${url}/api/admin/password`,
+        { currentPassword: pwForm.current, newPassword: pwForm.newPw },
+        { headers: { token } }
+      );
       if (res.data.success) {
         toast.success('Password changed');
-        setShowPwForm(false);
-        setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      } else toast.error(res.data.message);
-    } catch { toast.error('Failed to change password'); }
+        setPwForm({ current: '', newPw: '', confirm: '' });
+        setEditMode(null);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch {
+      toast.error('Failed to change password');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const avatarUrl = adminInfo?.profileImage ? `${url}/images/${adminInfo.profileImage}` : null;
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('admin-theme', newTheme);
+  };
 
   return (
-    <div className="settings-page" style={{ animation: 'fadeIn .4s' }}>
+    <div className="settings-page">
+      {/* Header */}
       <div className="a-page-header">
-        <div><h1>Settings</h1><p>Manage your account and preferences</p></div>
+        <div>
+          <h1>Settings</h1>
+          <p>Manage your account and preferences</p>
+        </div>
       </div>
 
       <div className="settings-grid">
-
-        {/* Profile card */}
+        {/* Profile Section */}
         <div className="a-card settings-section">
-          <p className="settings-section-title">Profile</p>
+          <h3 className="settings-section-title">
+            <User size={14} />
+            Profile
+          </h3>
 
           <div className="settings-avatar-wrap">
             <div className="settings-avatar-rel">
-              {avatarUrl
-                ? <img src={avatarUrl} alt="Avatar" className="settings-avatar" />
-                : <div className="settings-avatar-placeholder">👤</div>
-              }
-              <button
-                className="settings-avatar-upload"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                title="Change photo"
-              >
-                {isUploading ? '…' : '📷'}
-              </button>
-              <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleImageUpload} />
+              {admin?.avatar ? (
+                <img src={`${url}/images/${admin.avatar}`} alt="Avatar" className="settings-avatar" />
+              ) : (
+                <div className="settings-avatar-placeholder">
+                  <User size={32} strokeWidth={1.5} />
+                </div>
+              )}
+              <label className="settings-avatar-upload" title="Change avatar">
+                {uploading ? (
+                  <Loader2 size={14} className="spin" />
+                ) : (
+                  <Camera size={14} />
+                )}
+                <input type="file" accept="image/*" hidden onChange={handleAvatarChange} disabled={uploading} />
+              </label>
             </div>
             <div className="settings-avatar-info">
-              <h3>{adminInfo?.name || 'Admin'}</h3>
-              <p>{adminInfo?.email}</p>
+              <h3>{admin?.name || 'Admin'}</h3>
+              <p>{admin?.email || 'admin@roza.com'}</p>
             </div>
           </div>
 
-          {isEditing ? (
-            <form onSubmit={handleUpdateProfile} className="settings-form">
+          {editMode === 'profile' ? (
+            <div className="settings-form">
               <div className="settings-field">
-                <label>Name</label>
-                <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                <label htmlFor="settings-name">Name</label>
+                <input
+                  id="settings-name"
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  placeholder="Your name"
+                />
               </div>
               <div className="settings-field">
-                <label>Email</label>
-                <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+                <label htmlFor="settings-email">Email</label>
+                <input
+                  id="settings-email"
+                  type="email"
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  placeholder="your@email.com"
+                />
               </div>
               <div className="settings-form-btns">
-                <button type="submit" className="s-btn-save">Save Changes</button>
-                <button type="button" className="s-btn-cancel" onClick={() => { setIsEditing(false); setForm({ name: adminInfo?.name, email: adminInfo?.email }); }}>Cancel</button>
+                <button
+                  className="a-btn a-btn-primary"
+                  onClick={saveProfile}
+                  disabled={saving}
+                >
+                  {saving ? <Loader2 size={14} className="spin" /> : <Save size={14} />}
+                  Save Changes
+                </button>
+                <button
+                  className="a-btn a-btn-ghost"
+                  onClick={() => setEditMode(null)}
+                >
+                  <X size={14} />
+                  Cancel
+                </button>
               </div>
-            </form>
+            </div>
           ) : (
             <>
-              <div className="settings-info-row"><span className="s-label">Name</span><span className="s-value">{adminInfo?.name || '—'}</span></div>
-              <div className="settings-info-row"><span className="s-label">Email</span><span className="s-value">{adminInfo?.email || '—'}</span></div>
-              <div className="settings-info-row"><span className="s-label">Role</span><span className="s-value">Administrator</span></div>
-              <button className="s-btn-edit" onClick={() => setIsEditing(true)}>✏️ Edit Profile</button>
+              <div className="settings-info-row">
+                <span className="s-label">
+                  <User size={14} />
+                  Name
+                </span>
+                <span className="s-value">{admin?.name || 'Admin'}</span>
+              </div>
+              <div className="settings-info-row">
+                <span className="s-label">
+                  <Mail size={14} />
+                  Email
+                </span>
+                <span className="s-value">{admin?.email || 'admin@roza.com'}</span>
+              </div>
+              <button className="a-btn a-btn-ghost s-btn-edit" onClick={() => setEditMode('profile')}>
+                Edit Profile
+              </button>
             </>
           )}
         </div>
 
-        {/* Appearance */}
+        {/* Security Section */}
         <div className="a-card settings-section">
-          <p className="settings-section-title">Appearance</p>
+          <h3 className="settings-section-title">
+            <Shield size={14} />
+            Security
+          </h3>
+
+          {editMode === 'password' ? (
+            <div className="settings-form">
+              <div className="settings-field">
+                <label htmlFor="current-pw">Current Password</label>
+                <input
+                  id="current-pw"
+                  type="password"
+                  value={pwForm.current}
+                  onChange={e => setPwForm({ ...pwForm, current: e.target.value })}
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div className="settings-field">
+                <label htmlFor="new-pw">New Password</label>
+                <input
+                  id="new-pw"
+                  type="password"
+                  value={pwForm.newPw}
+                  onChange={e => setPwForm({ ...pwForm, newPw: e.target.value })}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div className="settings-field">
+                <label htmlFor="confirm-pw">Confirm New Password</label>
+                <input
+                  id="confirm-pw"
+                  type="password"
+                  value={pwForm.confirm}
+                  onChange={e => setPwForm({ ...pwForm, confirm: e.target.value })}
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <div className="settings-form-btns">
+                <button
+                  className="a-btn a-btn-primary"
+                  onClick={changePassword}
+                  disabled={saving}
+                >
+                  {saving ? <Loader2 size={14} className="spin" /> : <Lock size={14} />}
+                  Change Password
+                </button>
+                <button
+                  className="a-btn a-btn-ghost"
+                  onClick={() => setEditMode(null)}
+                >
+                  <X size={14} />
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="settings-info-row">
+                <span className="s-label">
+                  <Lock size={14} />
+                  Password
+                </span>
+                <span className="s-value">********</span>
+              </div>
+              <button className="a-btn a-btn-ghost s-btn-edit" onClick={() => setEditMode('password')}>
+                Change Password
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Appearance Section */}
+        <div className="a-card settings-section">
+          <h3 className="settings-section-title">
+            {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+            Appearance
+          </h3>
           <div className="settings-theme-row">
-            <span>{isDarkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}</span>
-            <button className="s-btn-theme" onClick={toggleTheme}>
-              Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
+            <span>Theme</span>
+            <button className="a-btn a-btn-ghost" onClick={toggleTheme}>
+              {theme === 'dark' ? (
+                <>
+                  <Sun size={16} />
+                  Switch to Light
+                </>
+              ) : (
+                <>
+                  <Moon size={16} />
+                  Switch to Dark
+                </>
+              )}
             </button>
           </div>
         </div>
-
-        {/* Security */}
-        <div className="a-card settings-section">
-          <p className="settings-section-title">Security</p>
-
-          {showPwForm ? (
-            <form onSubmit={handlePasswordChange} className="settings-form">
-              <div className="settings-field">
-                <label>Current Password</label>
-                <input type="password" value={pwForm.currentPassword} onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })} required />
-              </div>
-              <div className="settings-field">
-                <label>New Password</label>
-                <input type="password" value={pwForm.newPassword} onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })} required />
-              </div>
-              <div className="settings-field">
-                <label>Confirm New Password</label>
-                <input type="password" value={pwForm.confirmPassword} onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })} required />
-              </div>
-              <div className="settings-form-btns">
-                <button type="submit" className="s-btn-save">Change Password</button>
-                <button type="button" className="s-btn-cancel" onClick={() => { setShowPwForm(false); setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); }}>Cancel</button>
-              </div>
-            </form>
-          ) : (
-            <>
-              <div className="settings-info-row"><span className="s-label">Password</span><span className="s-value">••••••••</span></div>
-              <button className="s-btn-edit" onClick={() => setShowPwForm(true)}>🔒 Change Password</button>
-            </>
-          )}
-        </div>
-
-        {/* App info */}
-        <div className="a-card settings-section">
-          <p className="settings-section-title">Application</p>
-          <div className="settings-info-row"><span className="s-label">App Name</span><span className="s-value">Roza Fast Food</span></div>
-          <div className="settings-info-row"><span className="s-label">Payment Gateway</span><span className="s-value">Chapa</span></div>
-          <div className="settings-info-row"><span className="s-label">Version</span><span className="s-value">1.0.0</span></div>
-        </div>
-
       </div>
     </div>
   );
