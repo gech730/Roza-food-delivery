@@ -26,7 +26,7 @@ const Sidebar = ({ open, onClose }) => {
   const location = useLocation();
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${open ? 'open' : 'closed'}`}>
       {/* Brand + close button */}
       <div className="sb-header">
         <div className="sb-brand">
