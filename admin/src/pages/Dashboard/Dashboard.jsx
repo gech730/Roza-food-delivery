@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Package, DollarSign, Users, Utensils, ArrowRight } from 'lucide-react';
 import './Dashboard.css';
 
 const STATUS_META = {
@@ -63,7 +64,7 @@ const Dashboard = ({ url, token }) => {
 
   if (!stats) return (
     <div className="ds-empty">
-      <span>📊</span>
+      <Package size={48} className="text-muted" strokeWidth={1} />
       <p>No data available yet.</p>
     </div>
   );
@@ -87,23 +88,23 @@ const Dashboard = ({ url, token }) => {
       {/* ── Stat Cards ── */}
       <div className="ds-stats">
         <StatCard
-          icon="📦" label="Total Orders" value={fmt(stats.totalOrders)}
+          icon={<Package size={22} strokeWidth={2.5} />} label="Total Orders" value={fmt(stats.totalOrders)}
           sub={`+${stats.monthOrders} this month`} subPositive
-          accent="#f97316"
+          accent="var(--warning)"
           fillPct={Math.min(100, totalOrders > 0 ? (stats.monthOrders / totalOrders) * 100 * 3 : 40)}
         />
         <StatCard
-          icon="💰" label="Total Revenue" value={fmtMoney(stats.totalRevenue)}
+          icon={<DollarSign size={22} strokeWidth={2.5} />} label="Total Revenue" value={fmtMoney(stats.totalRevenue)}
           sub={`${fmtMoney(stats.monthRevenue)} this month`} subPositive
-          accent="#22c55e"
+          accent="var(--success)"
           fillPct={Math.min(100, stats.totalRevenue > 0 ? (stats.monthRevenue / stats.totalRevenue) * 100 * 3 : 40)}
         />
         <StatCard
-          icon="👥" label="Registered Users" value={fmt(stats.totalUsers)}
-          accent="#3b82f6" fillPct={72}
+          icon={<Users size={22} strokeWidth={2.5} />} label="Registered Users" value={fmt(stats.totalUsers)}
+          accent="var(--brand)" fillPct={72}
         />
         <StatCard
-          icon="🍽️" label="Menu Items" value={fmt(stats.totalFoods)}
+          icon={<Utensils size={22} strokeWidth={2.5} />} label="Menu Items" value={fmt(stats.totalFoods)}
           accent="#8b5cf6" fillPct={55}
         />
       </div>
@@ -115,7 +116,9 @@ const Dashboard = ({ url, token }) => {
         <div className="a-card ds-card">
           <div className="ds-card-header">
             <h3>Order Status</h3>
-            <button className="ds-link" onClick={() => navigate('/orders')}>View all →</button>
+            <button className="ds-link" onClick={() => navigate('/orders')}>
+              View all <ArrowRight size={14} style={{ marginLeft: 4, verticalAlign: 'text-bottom' }} />
+            </button>
           </div>
           {stats.ordersByStatus.length === 0 ? (
             <p className="ds-empty-text">No orders yet.</p>
@@ -195,7 +198,9 @@ const Dashboard = ({ url, token }) => {
       <div className="a-card ds-card ds-recent">
         <div className="ds-card-header">
           <h3>Recent Orders</h3>
-          <button className="ds-link" onClick={() => navigate('/orders')}>View all →</button>
+          <button className="ds-link" onClick={() => navigate('/orders')}>
+            View all <ArrowRight size={14} style={{ marginLeft: 4, verticalAlign: 'text-bottom' }} />
+          </button>
         </div>
 
         {stats.recentOrders.length === 0 ? (

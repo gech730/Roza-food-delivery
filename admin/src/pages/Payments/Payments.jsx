@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Search, CreditCard, ChevronLeft, ChevronRight, DollarSign, CheckCircle, Clock } from 'lucide-react';
 import './Payments.css';
 
 const Payments = ({ url, token }) => {
@@ -41,21 +42,21 @@ const Payments = ({ url, token }) => {
       {/* Summary cards */}
       <div className="pay-summary">
         <div className="a-card pay-stat">
-          <span className="pay-stat-icon">💰</span>
+          <span className="pay-stat-icon"><DollarSign size={24} /></span>
           <div>
             <p className="pay-stat-label">Revenue (this page)</p>
             <p className="pay-stat-value">${totalRevenue.toFixed(2)}</p>
           </div>
         </div>
         <div className="a-card pay-stat">
-          <span className="pay-stat-icon">✅</span>
+          <span className="pay-stat-icon"><CheckCircle size={24} /></span>
           <div>
             <p className="pay-stat-label">Paid</p>
             <p className="pay-stat-value">{orders.filter(o => o.isPaid).length}</p>
           </div>
         </div>
         <div className="a-card pay-stat">
-          <span className="pay-stat-icon">⏳</span>
+          <span className="pay-stat-icon"><Clock size={24} /></span>
           <div>
             <p className="pay-stat-label">Pending</p>
             <p className="pay-stat-value">{orders.filter(o => !o.isPaid).length}</p>
@@ -76,7 +77,10 @@ const Payments = ({ url, token }) => {
         {loading ? (
           <div className="a-spinner-wrap"><div className="a-spinner" /></div>
         ) : orders.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)' }}>💳 No transactions found.</div>
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <CreditCard size={48} style={{ marginBottom: 12 }} />
+            <div>No transactions found.</div>
+          </div>
         ) : (
           <table className="a-table">
             <thead>
@@ -115,9 +119,15 @@ const Payments = ({ url, token }) => {
 
       {pages > 1 && (
         <div className="a-pagination">
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-          <span>Page {page} of {pages}</span>
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>Next →</button>
+          <div className="a-pagination-info">Page {page} of {pages}</div>
+          <div className="a-pagination-controls">
+            <button className="a-btn a-btn-outline a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+             <ChevronLeft size={16} /> Prev
+            </button>
+            <button className="a-btn a-btn-outline a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>
+              Next <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       )}
     </div>

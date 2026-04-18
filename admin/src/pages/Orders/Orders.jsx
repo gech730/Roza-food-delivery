@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Search, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, PackageX } from 'lucide-react';
 import './Orders.css';
 
 const STATUSES = ['pending','paid','preparing','out_for_delivery','delivered','cancelled'];
@@ -63,7 +64,7 @@ const Orders = ({ url, token }) => {
       {/* Filters */}
       <div className="orders-toolbar a-card">
         <div className="a-search">
-          <span className="a-search-icon">🔍</span>
+          <Search size={18} />
           <input placeholder="Search by name, phone, ID…" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
         </div>
         <div className="orders-filters">
@@ -81,7 +82,10 @@ const Orders = ({ url, token }) => {
         {loading ? (
           <div className="a-spinner-wrap"><div className="a-spinner" /></div>
         ) : orders.length === 0 ? (
-          <div className="orders-empty">📦 No orders found.</div>
+          <div className="orders-empty" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <PackageX size={48} style={{ color: 'var(--muted)', marginBottom: 12 }} />
+            <div>No orders found.</div>
+          </div>
         ) : (
           <table className="a-table">
             <thead>
@@ -94,7 +98,9 @@ const Orders = ({ url, token }) => {
                     <td>
                       <button className="order-id-btn" onClick={() => setExpanded(expanded === order._id ? null : order._id)}>
                         #{order._id.slice(-8).toUpperCase()}
-                        <span style={{ marginLeft: 4 }}>{expanded === order._id ? '▲' : '▼'}</span>
+                        <span style={{ marginLeft: 4, display: 'inline-flex' }}>
+                          {expanded === order._id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </span>
                       </button>
                     </td>
                     <td>
@@ -160,9 +166,15 @@ const Orders = ({ url, token }) => {
 
       {pages > 1 && (
         <div className="a-pagination">
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-          <span>Page {page} of {pages}</span>
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>Next →</button>
+          <div className="a-pagination-info">Page {page} of {pages}</div>
+          <div className="a-pagination-controls">
+            <button className="a-btn a-btn-outline a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+             <ChevronLeft size={16} /> Prev
+            </button>
+            <button className="a-btn a-btn-outline a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>
+              Next <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       )}
     </div>

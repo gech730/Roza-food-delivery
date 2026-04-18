@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Search, Package, Edit2, Trash2 } from 'lucide-react';
 import './List.css';
 
 const List = ({ url, token }) => {
@@ -54,7 +55,7 @@ const List = ({ url, token }) => {
 
       <div className="a-card list-toolbar">
         <div className="a-search">
-          <span className="a-search-icon">🔍</span>
+          <Search size={18} />
           <input placeholder="Search products…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </div>
@@ -63,7 +64,10 @@ const List = ({ url, token }) => {
         {loading ? (
           <div className="a-spinner-wrap"><div className="a-spinner" /></div>
         ) : filtered.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)' }}>🍽️ No products found.</div>
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Package size={48} style={{ marginBottom: 12 }} />
+            <div>No products found.</div>
+          </div>
         ) : (
           <table className="a-table">
             <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
@@ -98,8 +102,12 @@ const List = ({ url, token }) => {
                         </>
                       ) : (
                         <>
-                          <button className="a-btn a-btn-ghost a-btn-sm" onClick={() => startEdit(item)}>✏️ Edit</button>
-                          <button className="a-btn a-btn-danger a-btn-sm" onClick={() => removeFood(item._id)}>🗑️ Delete</button>
+                          <button className="a-btn a-btn-ghost a-btn-sm" onClick={() => startEdit(item)}>
+                            <Edit2 size={14} style={{ marginRight: 4 }} /> Edit
+                          </button>
+                          <button className="a-btn a-btn-danger a-btn-sm" onClick={() => removeFood(item._id)}>
+                            <Trash2 size={14} style={{ marginRight: 4 }} /> Delete
+                          </button>
                         </>
                       )}
                     </div>

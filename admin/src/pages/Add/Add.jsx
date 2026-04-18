@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Upload, Plus } from 'lucide-react';
 import './Add.css';
 import { assets } from '../../assets/assets';
 
@@ -46,7 +47,7 @@ const Add = ({ url, token }) => {
                 ? <img src={URL.createObjectURL(image)} alt="Preview" className="add-image-preview" />
                 : (
                   <div className="add-image-placeholder">
-                    <span>📷</span>
+                    <Upload size={32} style={{ color: 'var(--muted)', marginBottom: 8 }} />
                     <p>Click to upload image</p>
                     <small>PNG, JPG up to 5MB</small>
                   </div>
@@ -80,8 +81,8 @@ const Add = ({ url, token }) => {
               </div>
             </div>
 
-            <button type="submit" className="a-btn a-btn-primary add-submit-btn" disabled={loading}>
-              {loading ? 'Adding…' : '➕ Add Product'}
+            <button type="submit" className="a-btn a-btn-primary add-submit-btn" disabled={loading} style={{ width: 'auto', padding: '12px 24px' }}>
+              {loading ? 'Adding…' : <><Plus size={18} style={{ marginRight: 6 }} /> Add Product</>}
             </button>
           </div>
         </form>

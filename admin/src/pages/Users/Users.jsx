@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Search, Users as UsersIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import './Users.css';
 
 const Users = ({ url, token }) => {
@@ -51,7 +52,7 @@ const Users = ({ url, token }) => {
 
       <div className="a-card users-toolbar">
         <div className="a-search">
-          <span className="a-search-icon">🔍</span>
+          <Search size={18} />
           <input placeholder="Search by name or email…" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
         </div>
       </div>
@@ -60,7 +61,10 @@ const Users = ({ url, token }) => {
         {loading ? (
           <div className="a-spinner-wrap"><div className="a-spinner" /></div>
         ) : users.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)' }}>👥 No users found.</div>
+          <div style={{ padding: 48, textAlign: 'center', color: 'var(--muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <UsersIcon size={48} style={{ marginBottom: 12 }} />
+            <div>No users found.</div>
+          </div>
         ) : (
           <table className="a-table">
             <thead>
@@ -105,9 +109,15 @@ const Users = ({ url, token }) => {
 
       {pages > 1 && (
         <div className="a-pagination">
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-          <span>Page {page} of {pages}</span>
-          <button className="a-btn a-btn-ghost a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>Next →</button>
+          <div className="a-pagination-info">Page {page} of {pages}</div>
+          <div className="a-pagination-controls">
+            <button className="a-btn a-btn-outline a-btn-sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+             <ChevronLeft size={16} /> Prev
+            </button>
+            <button className="a-btn a-btn-outline a-btn-sm" disabled={page === pages} onClick={() => setPage(p => p + 1)}>
+              Next <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       )}
     </div>

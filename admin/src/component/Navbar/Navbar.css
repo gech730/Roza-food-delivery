@@ -1,171 +1,112 @@
 ﻿.admin-navbar {
-  height: 60px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 20px;
+  height: var(--navbar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  flex-shrink: 0;
+  width: 100%;
+  z-index: 300;
+}
+.navbar-left, .navbar-right { display: flex; align-items: center; gap: 8px; }
+.navbar-brand { font-size: 16px; font-weight: 700; color: var(--text); margin-left: 4px; }
+
+.nb-toggle, .nb-icon-btn {
+  background: transparent; border: none; cursor: pointer;
+  width: 38px; height: 38px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2); transition: background 0.15s, color 0.15s;
+  position: relative; flex-shrink: 0;
+}
+.nb-toggle:hover, .nb-icon-btn:hover { background: var(--surface2); color: var(--text); }
+
+/* Notification badge */
+.nb-badge {
+  position: absolute; top: 5px; right: 5px;
+  min-width: 16px; height: 16px; padding: 0 3px;
+  background: var(--danger); color: #fff;
+  border-radius: 8px; border: 2px solid var(--surface);
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
 }
 
-/* Hamburger toggle */
-.nb-menu-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text2);
-  flex-shrink: 0;
-  transition: background .15s;
-}
-.nb-menu-btn:hover { background: var(--surface2); color: var(--text); }
+.nb-divider { width: 1px; height: 24px; background: var(--border); margin: 0 6px; }
 
-/* Search */
-.nb-search {
-  position: relative;
-  flex: 1;
-  max-width: 320px;
+/* Notification panel */
+.nb-notif-wrap { position: relative; }
+.nb-notif-panel {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  width: 320px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); z-index: 500;
+  display: flex; flex-direction: column; overflow: hidden;
 }
-.nb-search input {
-  padding: 7px 12px 7px 32px;
-  font-size: 13px;
-  background: var(--surface2);
-  border-color: transparent;
-  border-radius: 8px;
-  color: var(--text2);
+.nb-notif-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  font-size: 14px; font-weight: 700; color: var(--text);
 }
-.nb-search input:focus { background: var(--surface); border-color: var(--brand); }
-.nb-search input::placeholder { color: var(--muted); }
-.nb-search-ico {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  pointer-events: none;
+.nb-notif-header button {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); display: flex; align-items: center;
+  padding: 4px; border-radius: 4px;
 }
+.nb-notif-header button:hover { background: var(--surface2); color: var(--text); }
+.nb-notif-empty { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+.nb-notif-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; cursor: pointer; transition: background 0.12s;
+  border-bottom: 1px solid var(--border);
+}
+.nb-notif-item:last-of-type { border-bottom: none; }
+.nb-notif-item:hover { background: var(--surface2); }
+.nb-notif-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.nb-notif-body { flex: 1; min-width: 0; }
+.nb-notif-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.nb-notif-sub { font-size: 12px; color: var(--text2); margin-bottom: 2px; }
+.nb-notif-status { font-size: 11px; font-weight: 600; text-transform: capitalize; }
+.nb-notif-time { font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.nb-notif-footer {
+  padding: 12px 16px; text-align: center;
+  font-size: 13px; font-weight: 600; color: var(--brand);
+  cursor: pointer; border-top: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.nb-notif-footer:hover { background: var(--brand-light); }
 
-/* Right side */
-.nb-right {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-  flex-shrink: 0;
+/* Profile */
+.navbar-profile {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  cursor: pointer; padding: 5px 10px; border-radius: var(--radius);
+  transition: background 0.15s; user-select: none;
 }
+.navbar-profile:hover { background: var(--surface2); }
+.nb-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border2); }
+.nb-profile-info { display: flex; flex-direction: column; line-height: 1.2; }
+.nb-profile-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.nb-profile-role { font-size: 11px; color: var(--muted); }
 
-/* Icon buttons */
-.nb-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text2);
-  transition: background .15s;
-  position: relative;
-}
-.nb-btn:hover { background: var(--surface2); color: var(--text); }
-
-/* Notification dot */
-.nb-dot {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #EF4444;
-  border: 1.5px solid var(--surface);
-}
-
-/* Separator */
-.nb-sep {
-  width: 1px;
-  height: 22px;
-  background: var(--border);
-  margin: 0 6px;
-}
-
-/* Profile — always top-right */
-.nb-profile {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 5px 8px;
-  border-radius: 10px;
-  transition: background .15s;
-  user-select: none;
-}
-.nb-profile:hover { background: var(--surface2); }
-
-.nb-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--brand-light);
-  flex-shrink: 0;
-}
-.nb-profile-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-.nb-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.nb-role { font-size: 10px; color: var(--muted); }
-
-/* Dropdown */
 .nb-dropdown {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  min-width: 170px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  position: absolute; right: 0; top: calc(100% + 6px);
+  min-width: 175px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 400;
+  display: none; flex-direction: column; overflow: hidden; z-index: 400;
 }
-.nb-profile:hover .nb-dropdown { display: flex; }
-
-.nb-drop-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text2);
-  cursor: pointer;
-  transition: background .12s;
+.navbar-profile:hover .nb-dropdown { display: flex; }
+.nb-dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; font-size: 13px; font-weight: 500;
+  color: var(--text2); cursor: pointer; transition: background 0.12s;
 }
-.nb-drop-item:hover { background: var(--surface2); color: var(--text); }
-.nb-drop-item.danger { color: #DC2626; }
-.nb-drop-item.danger:hover { background: #FEF2F2; }
-.nb-drop-divider { height: 1px; background: var(--border); }
+.nb-dropdown-item:hover { background: var(--surface2); color: var(--text); }
+.nb-dropdown-item.danger { color: var(--danger); }
+.nb-dropdown-item.danger:hover { background: var(--danger-bg); }
+.nb-dropdown-divider { height: 1px; background: var(--border); }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .nb-search { display: none; }
-  .nb-sep { display: none; }
-  .nb-profile-text { display: none; }
+@media (max-width: 768px) {
+  .nb-profile-info { display: none; }
+  .admin-navbar { padding: 0 16px; }
+  .navbar-brand { display: none; }
+  .nb-notif-panel { right: -60px; width: 290px; }
 }

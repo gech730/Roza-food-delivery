@@ -1,53 +1,63 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import {
+  LayoutDashboard, ShoppingBag, Users, List as ListIcon,
+  PlusCircle, CreditCard, Settings, X
+} from 'lucide-react';
 import './Sidebar.css';
 
 const NAV = [
-  { to: '/dashboard', icon: '📊', label: 'Dashboard' },
-  { to: '/orders',    icon: '📦', label: 'Orders' },
-  { to: '/users',     icon: '👥', label: 'Users' },
-  { to: '/list',      icon: '🍽️', label: 'Products' },
-  { to: '/add',       icon: '➕', label: 'Add Product' },
-  { to: '/payments',  icon: '💳', label: 'Payments' },
-  { to: '/settings',  icon: '⚙️', label: 'Settings' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/orders',    icon: ShoppingBag,     label: 'Orders' },
+  { to: '/users',     icon: Users,           label: 'Users' },
+  { to: '/list',      icon: ListIcon,        label: 'Products' },
+  { to: '/add',       icon: PlusCircle,      label: 'Add Product' },
+  { to: '/payments',  icon: CreditCard,      label: 'Payments' },
+  { to: '/settings',  icon: Settings,        label: 'Settings' },
 ];
 
 const Sidebar = ({ open, onClose }) => {
   const location = useLocation();
 
   return (
-    <aside className="sidebar">
-      {/* Brand + close button */}
-      <div className="sb-header">
-        <div className="sb-brand">
-          <div className="sb-brand-icon">🍛</div>
-          <div className="sb-brand-text">
-            <span className="sb-brand-name">Roza Admin</span>
-            <span className="sb-brand-sub">Food Delivery</span>
+    <aside className={`sidebar ${open ? 'open' : 'closed'}`}>
+
+      {/* Header — logo + close button */}
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">🍛</div>
+          <div className="sidebar-logo-text">
+            <span className="sidebar-logo-name">Roza Admin</span>
+            <span className="sidebar-logo-sub">Food Delivery</span>
           </div>
         </div>
-        {/* ✕ close button — always visible */}
-        <button className="sb-close" onClick={onClose} title="Close sidebar">
-          ✕
+        {/* Close button — always visible so user can close on any screen */}
+        <button className="sidebar-close" onClick={onClose} title="Close sidebar">
+          <X size={18} />
         </button>
       </div>
 
       {/* Nav links */}
-      <nav className="sb-nav">
-        {NAV.map(({ to, icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `sb-link${isActive || (to === '/dashboard' && location.pathname === '/') ? ' active' : ''}`
-            }
-          >
-            <span className="sb-icon">{icon}</span>
-            <span className="sb-label">{label}</span>
-          </NavLink>
-        ))}
+      <nav className="sidebar-nav">
+        {NAV.map(({ to, icon: Icon, label }) => {
+          const isActive = location.pathname === to || (to === '/dashboard' && location.pathname === '/');
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              className={`sidebar-link ${isActive ? 'active' : ''}`}
+            >
+              <Icon className="sidebar-link-icon" size={20} strokeWidth={isActive ? 2.5 : 2} />
+              <span className="sidebar-link-label">{label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
 
-      <div className="sb-footer">Roza Fast Food © 2025</div>
+      {/* Footer */}
+      <div className="sidebar-footer">
+        <span>Roza Fast Food © 2025</span>
+      </div>
+
     </aside>
   );
 };

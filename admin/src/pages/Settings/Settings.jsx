@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useTheme } from '../../context/ThemeContext';
+import { User, Camera, Edit2, Lock, Moon, Sun } from 'lucide-react';
 import './Settings.css';
 
 const Settings = ({ url, token }) => {
@@ -85,7 +86,7 @@ const Settings = ({ url, token }) => {
             <div className="settings-avatar-rel">
               {avatarUrl
                 ? <img src={avatarUrl} alt="Avatar" className="settings-avatar" />
-                : <div className="settings-avatar-placeholder">👤</div>
+                : <div className="settings-avatar-placeholder" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface2)', color: 'var(--muted)' }}><User size={40} /></div>
               }
               <button
                 className="settings-avatar-upload"
@@ -93,7 +94,7 @@ const Settings = ({ url, token }) => {
                 disabled={isUploading}
                 title="Change photo"
               >
-                {isUploading ? '…' : '📷'}
+                {isUploading ? '…' : <Camera size={14} />}
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleImageUpload} />
             </div>
@@ -123,7 +124,9 @@ const Settings = ({ url, token }) => {
               <div className="settings-info-row"><span className="s-label">Name</span><span className="s-value">{adminInfo?.name || '—'}</span></div>
               <div className="settings-info-row"><span className="s-label">Email</span><span className="s-value">{adminInfo?.email || '—'}</span></div>
               <div className="settings-info-row"><span className="s-label">Role</span><span className="s-value">Administrator</span></div>
-              <button className="s-btn-edit" onClick={() => setIsEditing(true)}>✏️ Edit Profile</button>
+              <button className="s-btn-edit" onClick={() => setIsEditing(true)}>
+                <Edit2 size={14} style={{ marginRight: 6 }} /> Edit Profile
+              </button>
             </>
           )}
         </div>
@@ -132,7 +135,10 @@ const Settings = ({ url, token }) => {
         <div className="a-card settings-section">
           <p className="settings-section-title">Appearance</p>
           <div className="settings-theme-row">
-            <span>{isDarkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {isDarkMode ? <Moon size={18} /> : <Sun size={18} />}
+              {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+            </span>
             <button className="s-btn-theme" onClick={toggleTheme}>
               Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
             </button>
@@ -165,7 +171,9 @@ const Settings = ({ url, token }) => {
           ) : (
             <>
               <div className="settings-info-row"><span className="s-label">Password</span><span className="s-value">••••••••</span></div>
-              <button className="s-btn-edit" onClick={() => setShowPwForm(true)}>🔒 Change Password</button>
+              <button className="s-btn-edit" onClick={() => setShowPwForm(true)}>
+                <Lock size={14} style={{ marginRight: 6 }} /> Change Password
+              </button>
             </>
           )}
         </div>
