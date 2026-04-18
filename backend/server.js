@@ -15,170 +15,128 @@ import adminRouter from "./routes/adminRoute.js";
 
 dotenv.config();
 
-// Ensure uploads folder exists
+// Ensure uploads folder exists on fresh deploys
 try { mkdirSync("uploads", { recursive: true }); } catch (_) {}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-/* =========================
-   ✅ CORS CONFIG (FIXED)
-========================= */
+/* ── CORS ─────────────────────────────────────────────────────────────────────
+   Build allowed origins from env vars + hardcoded localhost for dev.
+   Strip trailing slashes so "https://example.com/" matches "https://example.com"
+   ──────────────────────────────────────────────────────────────────────────── */
+// update 
+const rawOrigins = [
 
-const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://roza-frontend.vercel.app",
-  "https://roza-admin.vercel.app",
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
-].filter(Boolean);
+];
+
+const allowedOrigins = rawOrigins
+  .filter(Boolean)
+  .map(o => o.replace(/\/$/, ""));   // strip trailing slash
+
+console.log("✅ Allowed CORS origins:", allowedOrigins);
 
 const corsOptions = {
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // allow Postman, curl
+  origin(origin, callback) {
+    // Allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
 
-    const normalizedOrigin = origin.replace(/\/$/, "");
-
-    const isAllowed = allowedOrigins.some(o =>
-      o && o.replace(/\/$/, "") === normalizedOrigin
-    );
-
-    if (isAllowed) {
-      return cb(null, true);
-    } else {
-      console.log("❌ Blocked by CORS:", origin);
-      return cb(null, false); // IMPORTANT: do NOT throw error
+    const clean = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(clean)) {
+      return callback(null, true);
     }
+
+    console.warn("🚫 CORS blocked:", origin);
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
 };
 
+// CORS must be FIRST — before everything else
 app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options("*", cors(corsOptions));
+// Handle preflight OPTIONS for all routes
+// Express 5 compatible — use a middleware instead of app.options("*")
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,token");
+    res.header("Access-Control-Allow-Credentials", "true");
+    return res.sendStatus(204);
+  }
+  next();
+});
 
-/* =========================
-   🔐 SECURITY
-========================= */
+/* ── SECURITY ─────────────────────────────────────────────────────────────── */
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
-
-/* =========================
-   📦 BODY PARSER
-========================= */
-
+/* ── BODY PARSING ─────────────────────────────────────────────────────────── */
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-/* =========================
-   📊 LOGGING
-========================= */
-
+/* ── LOGGING ──────────────────────────────────────────────────────────────── */
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-/* =========================
-   🚦 RATE LIMITING
-========================= */
-
+/* ── RATE LIMITING ────────────────────────────────────────────────────────── */
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many requests, please try again later.",
-  },
+  message: { success: false, message: "Too many requests, please try again later." },
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  message: {
-    success: false,
-    message: "Too many login attempts, please try again later.",
-  },
+  message: { success: false, message: "Too many login attempts, please try again later." },
 });
 
 app.use(globalLimiter);
-app.use("/api/user/login", authLimiter);
+app.use("/api/user/login",    authLimiter);
 app.use("/api/user/register", authLimiter);
-app.use("/api/admin/login", authLimiter);
+app.use("/api/admin/login",   authLimiter);
 
-/* =========================
-   📁 STATIC FILES
-========================= */
-
+/* ── STATIC FILES ─────────────────────────────────────────────────────────── */
 app.use("/images", express.static("uploads"));
 
-/* =========================
-   🗄 DATABASE
-========================= */
-
+/* ── DATABASE ─────────────────────────────────────────────────────────────── */
 connectDB();
 
-/* =========================
-   🚀 ROUTES
-========================= */
-
-app.use("/api/food", foodRouter);
-app.use("/api/user", userRouter);
-app.use("/api/cart", cartRouter);
+/* ── ROUTES ───────────────────────────────────────────────────────────────── */
+app.use("/api/food",  foodRouter);
+app.use("/api/user",  userRouter);
+app.use("/api/cart",  cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/admin", adminRouter);
 
-/* =========================
-   ❤️ HEALTH CHECK
-========================= */
-
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  });
+/* ── HEALTH CHECK ─────────────────────────────────────────────────────────── */
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-/* =========================
-   ❌ 404 HANDLER
-========================= */
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
+/* ── 404 ──────────────────────────────────────────────────────────────────── */
+app.use((_req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
 });
 
-/* =========================
-   ⚠️ GLOBAL ERROR HANDLER
-========================= */
-
-app.use((err, req, res, next) => {
+/* ── GLOBAL ERROR HANDLER ─────────────────────────────────────────────────── */
+app.use((err, _req, res, _next) => {
   console.error("[ERROR]", err.message);
-
   res.status(err.status || 500).json({
     success: false,
-    message:
-      process.env.NODE_ENV === "production"
-        ? "Internal server error"
-        : err.message,
+    message: process.env.NODE_ENV === "production" ? "Internal server error" : err.message,
   });
 });
 
-/* =========================
-   🟢 START SERVER
-========================= */
-
+/* ── START ────────────────────────────────────────────────────────────────── */
 app.listen(PORT, () => {
-  console.log(
-    `🚀 Server running on port ${PORT} [${
-      process.env.NODE_ENV || "development"
-    }]`
-  );
+  console.log(`🚀 Server on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
 });
