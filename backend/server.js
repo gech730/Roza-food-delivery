@@ -21,13 +21,7 @@ try { mkdirSync("uploads", { recursive: true }); } catch (_) {}
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-/* ── CORS ─────────────────────────────────────────────────────────────────────
-   Build allowed origins from env vars + hardcoded localhost for dev.
-   Strip trailing slashes so "https://example.com/" matches "https://example.com"
-   ──────────────────────────────────────────────────────────────────────────── */
-// update 
 const rawOrigins = [
-
   "http://localhost:5173",
   "http://localhost:5174",
   process.env.FRONTEND_URL,

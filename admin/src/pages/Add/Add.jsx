@@ -5,16 +5,14 @@ import { Upload, Plus, Loader2 } from 'lucide-react';
 import './Add.css';
 
 const CATEGORIES = [
-  'Salad', 
-  'Rolls', 
-  'Deserts', 
-  'Sandwich', 
-  'Cake', 
-  'Pure Veg', 
-  'Pasta', 
-  'Noodles', 
-  'Biryani', 
-  'Drinks'
+  'የጾም ምግቦች',
+  'የፍስክ ምግቦች',
+  'ቁርስ',
+  'ትኩስ መጠጥ',
+  'ቀዝቃዛ መጠጥ',
+  'ባህላዊ መጠጥ',
+  'መክሰስ',
+  'ፓስታና ማካሮኒ'
 ];
 
 const Add = ({ url, token }) => {
@@ -24,7 +22,7 @@ const Add = ({ url, token }) => {
     name: '', 
     description: '', 
     price: '', 
-    category: 'Salad' 
+    category: 'የጾም ምግቦች' 
   });
 
   const onChange = e => setData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -40,7 +38,7 @@ const Add = ({ url, token }) => {
       const res = await axios.post(`${url}/api/food/add`, form, { headers: { token } });
       if (res.data.success) {
         toast.success('Product added successfully!');
-        setData({ name: '', description: '', price: '', category: 'Salad' });
+        setData({ name: '', description: '', price: '', category: 'የጾም ምግቦች' });
         setImage(null);
       } else {
         toast.error(res.data.message);

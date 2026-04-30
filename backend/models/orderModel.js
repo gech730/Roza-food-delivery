@@ -24,7 +24,7 @@ const orderSchema=new mongoose.Schema({
       },
     ],
 
-    // Pricing
+   
     itemsPrice: {
       type: Number,
       required: true,
@@ -35,12 +35,13 @@ const orderSchema=new mongoose.Schema({
       type: Number,
       default: 0,
     },
+
     totalPrice: {
       type: Number,
       required: true,
     },
 
-    // Delivery info
+   
     shippingAddress: {
       fullName: String,
       phone: String,
@@ -50,7 +51,7 @@ const orderSchema=new mongoose.Schema({
       postalCode: String,
     },
 
-    // Payment info (Chapa)
+   
     paymentMethod: {
       type: String,
       default: "Chapa",
@@ -73,7 +74,6 @@ const orderSchema=new mongoose.Schema({
       type: Date,
     },
 
-    // Order status
     isDelivered: {
       type: Boolean,
       default: false,
@@ -99,6 +99,7 @@ const orderSchema=new mongoose.Schema({
     chapa_verify_data: {
       type: Object,
     },
+    
 }, { timestamps: true });
 
 // Indexes for query performance

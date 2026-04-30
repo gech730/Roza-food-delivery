@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   AreaChart, 
   Area, 
@@ -54,13 +55,13 @@ const generateChartData = (monthOrders, monthRevenue) => {
 const StatCard = ({ icon: Icon, label, value, sub, subPositive, accent }) => (
   <div className="ds-stat">
     <div className="ds-stat-header">
-      <div className="ds-stat-icon" style={{ background: `${accent}15`, color: accent }}>
-        <Icon size={22} strokeWidth={1.8} />
+      <div className="ds-stat-icon" style={{ background: `${accent}20`, color: accent }}>
+        <Icon size={24} strokeWidth={1.8} />
       </div>
-      {subPositive !== undefined && (
-        <div className={`ds-stat-badge ${subPositive ? 'positive' : ''}`}>
-          {subPositive && <ArrowUpRight size={14} />}
-          {sub}
+      {sub && (
+        <div className={`ds-stat-trend ${subPositive ? 'positive' : 'negative'}`}>
+          <TrendingUp size={14} className={subPositive ? '' : 'rotated'} />
+          <span>{sub}</span>
         </div>
       )}
     </div>
@@ -93,6 +94,15 @@ const Dashboard = ({ url, token }) => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
+
+  // Derive chart colors from theme
+  const chartColors = {
+    grid: isDarkMode ? '#2a2d3e' : '#e4e6ef',
+    tick: isDarkMode ? '#6b6f82' : '#9395a5',
+    tooltip: isDarkMode ? '#1a1d27' : '#ffffff',
+    tooltipBorder: isDarkMode ? '#2a2d3e' : '#e4e6ef',
+  };
 
   useEffect(() => {
     axios.get(`${url}/api/admin/dashboard`, { headers: { token } })
@@ -126,8 +136,8 @@ const Dashboard = ({ url, token }) => {
       {/* Header */}
       <div className="ds-header">
         <div>
-          <h1>Dashboard</h1>
-          <p>Welcome back! Here&apos;s your restaurant overview.</p>
+          <h1>Dashboard Overview</h1>
+          <p>Monitor your restaurant's performance and manage operations</p>
         </div>
         <div className="ds-header-date">
           {new Date().toLocaleDateString('en-US', { 
@@ -145,16 +155,16 @@ const Dashboard = ({ url, token }) => {
           icon={Package}
           label="Total Orders"
           value={fmt(stats.totalOrders)}
-          sub={`+${stats.monthOrders} this month`}
-          subPositive={true}
+          sub={`${stats.monthOrders > 0 ? '+' : ''}${Math.round((stats.monthOrders / Math.max(stats.totalOrders - stats.monthOrders, 1)) * 100)}%`}
+          subPositive={stats.monthOrders > 0}
           accent="#F97316"
         />
         <StatCard
           icon={DollarSign}
           label="Total Revenue"
           value={fmtMoney(stats.totalRevenue)}
-          sub={`+${fmtMoney(stats.monthRevenue)} this month`}
-          subPositive={true}
+          sub={`${stats.monthRevenue > 0 ? '+' : ''}${Math.round((stats.monthRevenue / Math.max(stats.totalRevenue - stats.monthRevenue, 1)) * 100)}%`}
+          subPositive={stats.monthRevenue > 0}
           accent="#10B981"
         />
         <StatCard
@@ -192,17 +202,17 @@ const Dashboard = ({ url, token }) => {
                     <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} vertical={false} />
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                  tick={{ fill: chartColors.tick, fontSize: 12 }}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                  tick={{ fill: chartColors.tick, fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Area 
@@ -231,17 +241,17 @@ const Dashboard = ({ url, token }) => {
           <div className="ds-chart-container">
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} vertical={false} />
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false}
-                  tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                  tick={{ fill: chartColors.tick, fontSize: 12 }}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false}
-                  tick={{ fill: 'var(--muted)', fontSize: 12 }}
+                  tick={{ fill: chartColors.tick, fontSize: 12 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar 

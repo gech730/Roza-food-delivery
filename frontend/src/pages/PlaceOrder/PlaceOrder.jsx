@@ -21,7 +21,7 @@ function PlaceOrder() {
   const placeOrder = async (event) => {
     event.preventDefault();
 
-    if (!token) return toast.error("Please sign in first");
+    if (!token) return toast.error("እባክዎ በመጀመሪያ ይግቡ (Please sign in first)");
 
     const items = Object.entries(cartItems)
       .filter(([, qty]) => qty > 0)
@@ -32,10 +32,10 @@ function PlaceOrder() {
       })
       .filter(Boolean);
 
-    if (items.length === 0) return toast.error("Your cart is empty");
+    if (items.length === 0) return toast.error("ዘንቢልዎ ባዶ ነው (Your cart is empty)");
 
     const itemsPrice = getTotalCartAmount();
-    const deliveryFee = 2;
+    const deliveryFee = 50; // Updated delivery fee to 50 ETB
     const totalAmount = itemsPrice + deliveryFee;
 
     setLoading(true);
@@ -58,10 +58,10 @@ function PlaceOrder() {
       if (res.data.checkout_url) {
         window.location.href = res.data.checkout_url;
       } else {
-        toast.error(res.data.error || "Payment initialization failed");
+        toast.error(res.data.error || "ክፍያ መጀመር አልተቻለም (Payment initialization failed)");
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || "Something went wrong. Please try again.");
+      toast.error(err.response?.data?.error || "የሆነ ስህተት ተፈጥሯል (Something went wrong. Please try again.)");
     } finally {
       setLoading(false);
     }
@@ -70,42 +70,42 @@ function PlaceOrder() {
   return (
     <form onSubmit={placeOrder} className="place-order">
       <div className="place-order-left">
-        <p className="title">Delivery Information</p>
+        <p className="title">የማድረሻ አድራሻ (Delivery Information)</p>
         <div className="multi-fields">
-          <input name="firstName" onChange={onChangeHandler} required value={data.firstName} type="text" placeholder="First name" />
-          <input name="lastName" onChange={onChangeHandler} required value={data.lastName} type="text" placeholder="Last name" />
+          <input name="firstName" onChange={onChangeHandler} required value={data.firstName} type="text" placeholder="የመጀመሪያ ስም (First name)" />
+          <input name="lastName" onChange={onChangeHandler} required value={data.lastName} type="text" placeholder="የአባት ስም (Last name)" />
         </div>
-        <input name="email" onChange={onChangeHandler} required value={data.email} type="email" placeholder="Email address" />
-        <input name="phone" onChange={onChangeHandler} required value={data.phone} type="text" placeholder="Phone number" />
-        <input name="address" onChange={onChangeHandler} required value={data.address} type="text" placeholder="Street address" />
+        <input name="email" onChange={onChangeHandler} required value={data.email} type="email" placeholder="ኢሜይል (Email address)" />
+        <input name="phone" onChange={onChangeHandler} required value={data.phone} type="text" placeholder="ስልክ ቁጥር (Phone number)" />
+        <input name="address" onChange={onChangeHandler} required value={data.address} type="text" placeholder="የሰፈር ስም / አድራሻ (Street address)" />
         <div className="multi-fields">
-          <input name="city" onChange={onChangeHandler} required value={data.city} type="text" placeholder="City" />
-          <input name="region" onChange={onChangeHandler} required value={data.region} type="text" placeholder="Region" />
+          <input name="city" onChange={onChangeHandler} required value={data.city} type="text" placeholder="ከተማ (City)" />
+          <input name="region" onChange={onChangeHandler} required value={data.region} type="text" placeholder="ክፍለ ከተማ (Region)" />
         </div>
-        <input name="postalCode" onChange={onChangeHandler} value={data.postalCode} type="text" placeholder="Postal code (optional)" />
+        <input name="postalCode" onChange={onChangeHandler} value={data.postalCode} type="text" placeholder="ፖስታ ቁጥር - አማራጭ (Postal code)" />
       </div>
 
       <div className="place-order-right">
         <div className="cart-total">
-          <h2>Cart Totals</h2>
+          <h2>የክፍያ ማጠቃለያ (Cart Totals)</h2>
           <div>
             <div className="cart-total-details">
-              <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>የምግብ ዋጋ (Subtotal)</p>
+              <p>{getTotalCartAmount()} ብር</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
+              <p>የማድረሻ ሂሳብ (Delivery Fee)</p>
+              <p>{getTotalCartAmount() === 0 ? 0 : 50} ብር</p>
             </div>
             <hr />
             <div className="cart-total-details">
-              <p>Total</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</p>
+              <p>አጠቃላይ ድምር (Total)</p>
+              <p>{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 50} ብር</p>
             </div>
           </div>
           <button type="submit" disabled={loading}>
-            {loading ? "Processing…" : "PROCEED TO PAYMENT"}
+            {loading ? "በማስኬድ ላይ... (Processing…)" : "ወደ ክፍያ ይቀጥሉ (PROCEED TO PAYMENT)"}
           </button>
         </div>
       </div>

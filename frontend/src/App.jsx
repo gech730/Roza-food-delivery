@@ -11,6 +11,7 @@ import LoginPopUp from './components/LoginPopUP/LoginPopUp.jsx';
 import Verify from './pages/verify/Verify.jsx';
 import UserOrder from './pages/userOrder/UserOrder.jsx';
 import Profile from './pages/Profile/Profile.jsx';
+import Contact from './pages/Contact/Contact.jsx';
 import { StoreContext } from './context/StoreContext.jsx';
 
 const App = () => {
@@ -35,6 +36,7 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/cart' element={<Cart />} />
+          <Route path='/contact' element={<Contact />} />
           <Route path='/order'    element={<Protected><PlaceOrder /></Protected>} />
           <Route path='/verify'   element={<Verify />} />
           <Route path='/myOrders' element={<Protected><UserOrder /></Protected>} />

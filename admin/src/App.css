@@ -1,52 +1,101 @@
-﻿/* =============================================
-   ADMIN LAYOUT
-   - Navbar: fixed full-width at top
-   - Below navbar: sidebar LEFT + content RIGHT
-   ============================================= */
+/* ═══════════════════════════════════════════
+   APP LAYOUT — Production Ready
+   ═══════════════════════════════════════════ */
 
-/* Root fills viewport */
+/* ─── Root Container ─── */
 .ap-root {
   min-height: 100vh;
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
 }
 
-/* Navbar: FIXED at top, full width */
+/* ─── Fixed Navbar Bar ─── */
 .ap-navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: var(--navbar-h);
-  z-index: 300;
-  /* actual styling is in Navbar.css */
+  z-index: 400;
 }
 
-/* Body row: pushed down by navbar height, fills rest of viewport */
+/* ─── Body Row (sidebar + content) ─── */
 .ap-row {
   display: flex;
-  flex-direction: row;
-  height: calc(100vh - var(--navbar-h));
-  margin-top: var(--navbar-h);   /* offset for fixed navbar */
-  overflow: hidden;
+  margin-top: var(--navbar-h);
+  min-height: calc(100vh - var(--navbar-h));
 }
 
-/* Content: fills all width to the RIGHT of sidebar, scrolls */
+/* ─── Content Area ─── */
 .ap-content {
   flex: 1;
-  min-width: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 28px 32px;
+  min-width: 0;                           /* prevent overflow */
+  margin-left: var(--sidebar-w);
+  min-height: calc(100vh - var(--navbar-h));
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  transition: margin-left var(--transition-slow);
+}
+
+:root.dark .ap-content {
   background: var(--bg);
 }
 
-/* Mobile overlay */
+/* Sidebar collapsed — shrink margin and keep gap */
+.ap-content.sidebar-collapsed {
+  margin-left: var(--sidebar-w-collapsed);
+}
+
+/* ─── Page Content Wrapper ─── */
+.ap-pages {
+  flex: 1;
+  padding: 28px 32px;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  animation: fadeInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Mobile Overlay ─── */
 .ap-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 199;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 350;
+  animation: overlayIn 0.2s ease;
 }
 
-@media (max-width: 900px) { .ap-content { padding: 20px; } }
-@media (max-width: 480px) { .ap-content { padding: 14px; } }
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════ */
+
+/* Mobile: sidebar is overlay, content full width */
+@media (max-width: 1023px) {
+  .ap-content,
+  .ap-content.sidebar-collapsed {
+    margin-left: 0 !important;
+  }
+
+  .ap-pages {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ap-pages {
+    padding: 16px 12px;
+  }
+}

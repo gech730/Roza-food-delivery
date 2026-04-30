@@ -8,13 +8,13 @@ const Footer = () => (
     <div className="footer-top">
       <div className="footer-brand">
         <div className="footer-logo">
-          <div className="footer-logo-icon">🍛</div>
+          <div className="footer-logo-icon">🍲</div>
           <div>
-            <span className="footer-logo-name">Roza Fast Food</span>
-            <span className="footer-logo-tagline">Authentic Ethiopian Cuisine</span>
+            <span className="footer-logo-name">ሮዛ ምግብ ማድረሻ</span>
+            <span className="footer-logo-tagline">የሀገር በቀል ጣዕም</span>
           </div>
         </div>
-        <p>Bringing the rich, bold flavors of Ethiopia to your doorstep. Made fresh, delivered fast.</p>
+        <p>ልዩ እና የረቀቀ የኢትዮጵያ ምግብ በፍጥነት እቤቶ ድረስ እናቀርባለን።</p>
         <div className="footer-social">
           <a href="#" aria-label="Facebook"><img src={assets.facebook_icon} alt="Facebook" /></a>
           <a href="#" aria-label="Twitter"><img src={assets.twitter_icon} alt="Twitter" /></a>
@@ -23,29 +23,29 @@ const Footer = () => (
       </div>
 
       <div className="footer-links">
-        <h4>Company</h4>
+        <h4>ኩባንያ</h4>
         <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><a href="#explorer-menu">Menu</a></li>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Privacy Policy</a></li>
+          <li><Link to="/">መነሻ</Link></li>
+          <li><a href="#explorer-menu">ምናሌ</a></li>
+          <li><Link to="/contact">አድራሻችን</Link></li>
+          <li><a href="#">የግላዊነት መመሪያ</a></li>
         </ul>
       </div>
 
       <div className="footer-links">
-        <h4>Get in Touch</h4>
+        <h4>ያግኙን</h4>
         <ul>
-          <li>📞 +251 970 143 109</li>
-          <li>✉️ hello@rozafastfood.com</li>
-          <li>📍 Addis Ababa, Ethiopia</li>
-          <li>🕐 Open: 8AM – 10PM</li>
+          <li>📞 +251 911 23 45 67</li>
+          <li>✉️ info@rozafood.com</li>
+          <li>📍 አዲስ አበባ፣ ኢትዮጵያ</li>
+          <li>🕐 ክፍት ነው: 12:00 LT – 4:00 LT</li>
         </ul>
       </div>
     </div>
 
     <div className="footer-bottom">
-      <p>© 2025 Roza Fast Food. All rights reserved.</p>
-      <p>Made with ❤️ in Ethiopia</p>
+      <p>© 2026 ሮዛ ምግብ ማድረሻ. መብቱ በህግ የተጠበቀ ነው።</p>
+      <p>በኢትዮጵያ የተሰራ ❤️</p>
     </div>
   </footer>
 );

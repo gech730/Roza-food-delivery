@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 
-/**
- * Admin Model Schema
- * Stores admin user credentials for the admin panel
- */
 const adminSchema = new mongoose.Schema({
   name: { 
     type: String, 

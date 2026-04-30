@@ -43,12 +43,17 @@ const userSchema = new mongoose.Schema( {
       region: String,
       postalCode: String,
     },
-
+  profileImage: {
+    type: String,
+    default: null
+  },
+  
     // Authentication 
     isVerified: {
       type: Boolean,
       default: false,
     },
+
 
     resetPasswordToken: String,
     resetPasswordExpire: Date,

@@ -32,7 +32,7 @@ const Navarbar = ({ setShowLogin }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { getTotalCartAmount, token, logout, userInfo, url } = useContext(StoreContext);
+  const { getTotalCartAmount, token, logout, userInfo, url, language, setLanguage, labels } = useContext(StoreContext);
   const { isDarkMode, toggleTheme } = useTheme();
   const menuRef = useRef(null);
 
@@ -76,10 +76,10 @@ const Navarbar = ({ setShowLogin }) => {
 
       {/* Logo */}
       <Link to="/" className="navbar-logo" onClick={close}>
-        <div className="navbar-logo-icon">🍛</div>
+        <div className="navbar-logo-icon">🍲</div>
         <div className="navbar-logo-text">
-          <span className="navbar-logo-name">Roza</span>
-          <span className="navbar-logo-sub">Fast Food</span>
+          <span className="navbar-logo-name">{labels.nav.brandName}</span>
+          <span className="navbar-logo-sub">{labels.nav.brandSub}</span>
         </div>
       </Link>
 
@@ -90,22 +90,23 @@ const Navarbar = ({ setShowLogin }) => {
           onClick={close}
           className={isHome && location.hash === '' ? 'active' : ''}
         >
-          Home
+          {labels.nav.home}
         </Link>
 
         <button
           className={`nav-scroll-btn ${isHome && location.hash === '#explorer-menu' ? 'active' : ''}`}
           onClick={() => scrollTo('explorer-menu')}
         >
-          Menu
+          {labels.nav.menu}
         </button>
 
-        <button
-          className={`nav-scroll-btn ${isHome && location.hash === '#footer' ? 'active' : ''}`}
-          onClick={() => scrollTo('footer')}
+        <Link
+          to="/contact"
+          onClick={close}
+          className={location.pathname === '/contact' ? 'active' : ''}
         >
-          Contact
-        </button>
+          {labels.nav.contact}
+        </Link>
 
         {token && (
           <Link
@@ -113,14 +114,31 @@ const Navarbar = ({ setShowLogin }) => {
             onClick={close}
             className={location.pathname === '/myOrders' ? 'active' : ''}
           >
-            My Orders
+            {labels.nav.myOrders}
           </Link>
         )}
       </ul>
 
       {/* Right side */}
       <div className="navar-right">
-        <button className="theme-toggle" onClick={toggleTheme} title={isDarkMode ? 'Light mode' : 'Dark mode'}>
+        <div className="language-switch">
+          <button
+            type="button"
+            className={language === 'am' ? 'active' : ''}
+            onClick={() => setLanguage('am')}
+          >
+            AM
+          </button>
+          <button
+            type="button"
+            className={language === 'en' ? 'active' : ''}
+            onClick={() => setLanguage('en')}
+          >
+            EN
+          </button>
+        </div>
+
+        <button className="theme-toggle" onClick={toggleTheme} title={isDarkMode ? labels.nav.lightMode : labels.nav.darkMode}>
           {isDarkMode ? <SunIcon /> : <MoonIcon />}
         </button>
 
@@ -132,7 +150,7 @@ const Navarbar = ({ setShowLogin }) => {
         </div>
 
         {!token ? (
-          <button onClick={() => setShowLogin(true)} className="sign-in-btn">Sign In</button>
+          <button onClick={() => setShowLogin(true)} className="sign-in-btn">{labels.nav.signIn}</button>
         ) : (
           <div className="navbar-profile">
             {profileImg
@@ -141,15 +159,15 @@ const Navarbar = ({ setShowLogin }) => {
             }
             <ul className="nav-profile-dropdown">
               <li onClick={() => { navigate('/profile'); close(); }}>
-                <img src={assets.profile_icon} alt="" /><p>Profile</p>
+                <img src={assets.profile_icon} alt="" /><p>{labels.nav.profile}</p>
               </li>
               <hr />
               <li onClick={() => { navigate('/myOrders'); close(); }}>
-                <img src={assets.bag_icon} alt="" /><p>My Orders</p>
+                <img src={assets.bag_icon} alt="" /><p>{labels.nav.myOrders}</p>
               </li>
               <hr />
               <li onClick={handleLogout}>
-                <img src={assets.logout_icon} alt="" /><p>Logout</p>
+                <img src={assets.logout_icon} alt="" /><p>{labels.nav.logout}</p>
               </li>
             </ul>
           </div>

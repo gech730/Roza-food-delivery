@@ -5,7 +5,7 @@ import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
 
 const LoginPopUp = ({ setShowLogin }) => {
-  const { login, register } = useContext(StoreContext);
+  const { login, register, labels } = useContext(StoreContext);
   const [currentState, setCurrentState] = useState("Login");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ name: "", email: "", password: "" });
@@ -21,7 +21,7 @@ const LoginPopUp = ({ setShowLogin }) => {
         : await register(data.name, data.email, data.password);
 
       if (result.success) {
-        toast.success(currentState === "Login" ? "Welcome back!" : "Account created!");
+        toast.success(currentState === "Login" ? "እንኳን ደህና መጡ! (Welcome back!)" : "አካውንት ተፈጥሯል! (Account created!)");
         setShowLogin(false);
       } else {
         toast.error(result.message);
@@ -35,10 +35,10 @@ const LoginPopUp = ({ setShowLogin }) => {
     <div className="login-popup" onClick={(e) => e.target === e.currentTarget && setShowLogin(false)}>
       <form className="login-popup-container" onSubmit={onSubmit}>
         <div className="login-popup-header">
-          <div className="login-popup-logo">🍛</div>
+          <div className="login-popup-logo">🍲</div>
           <div>
-            <h2>{currentState === "Login" ? "Welcome Back" : "Create Account"}</h2>
-            <p>Roza Fast Food</p>
+            <h2>{currentState === "Login" ? labels.login.login : labels.login.register}</h2>
+            <p>{labels.nav.brandSub}</p>
           </div>
           <button type="button" className="login-popup-close" onClick={() => setShowLogin(false)}>
             <img src={assets.cross_icon} alt="Close" />
@@ -48,34 +48,34 @@ const LoginPopUp = ({ setShowLogin }) => {
         <div className="login-popup-inputs">
           {currentState !== "Login" && (
             <div className="login-input-group">
-              <label>Full Name</label>
-              <input onChange={onChange} value={data.name} name="name" type="text" placeholder="Your full name" required />
+              <label>{labels.login.fullName}</label>
+              <input onChange={onChange} value={data.name} name="name" type="text" placeholder={labels.login.placeholderName} required />
             </div>
           )}
           <div className="login-input-group">
-            <label>Email Address</label>
-            <input onChange={onChange} value={data.email} name="email" type="email" placeholder="your@email.com" required />
+            <label>{labels.login.email}</label>
+            <input onChange={onChange} value={data.email} name="email" type="email" placeholder={labels.login.placeholderEmail} required />
           </div>
           <div className="login-input-group">
-            <label>Password</label>
-            <input onChange={onChange} value={data.password} name="password" type="password" placeholder="••••••••" required />
+            <label>{labels.login.password}</label>
+            <input onChange={onChange} value={data.password} name="password" type="password" placeholder={labels.login.placeholderPassword} required />
           </div>
         </div>
 
         <div className="login-popup-terms">
           <input type="checkbox" id="terms" required />
-          <label htmlFor="terms">I agree to the <a href="#">Terms & Privacy Policy</a></label>
+          <label htmlFor="terms"><a href="#">{labels.login.terms}</a></label>
         </div>
 
         <button type="submit" className="login-popup-btn" disabled={loading}>
-          {loading ? "Please wait..." : currentState === "Login" ? "Sign In" : "Create Account"}
+          {loading ? labels.login.wait : currentState === "Login" ? labels.login.login : labels.login.createAccount}
         </button>
 
         <p className="login-popup-switch">
           {currentState === "Login" ? (
-            <>Don't have an account? <span onClick={() => setCurrentState("Sign Up")}>Sign Up</span></>
+            <>{labels.login.noAccount} <span onClick={() => setCurrentState("Sign Up")}>{labels.login.register}</span></>
           ) : (
-            <>Already have an account? <span onClick={() => setCurrentState("Login")}>Sign In</span></>
+            <>{labels.login.haveAccount} <span onClick={() => setCurrentState("Login")}>{labels.login.login}</span></>
           )}
         </p>
       </form>

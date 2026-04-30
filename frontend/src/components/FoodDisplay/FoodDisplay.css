@@ -1,30 +1,56 @@
-.food-display { margin-top: 48px; }
+.food-display { margin-top: 64px; }
 
-.food-display-header { margin-bottom: 28px; }
+.food-display-header { margin-bottom: 32px; }
 .food-display-label {
-  font-size: 12px; font-weight: 600;
-  color: var(--brand-gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-gold);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
 }
 .food-display-header h2 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(22px, 2.5vw, 30px); font-weight: 700; color: var(--text-primary);
+  font-size: clamp(26px, 3.2vw, 40px);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
 
 .food-display-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 32px;
 }
 
 .food-display-empty {
-  text-align: center; padding: 60px 20px; color: var(--text-muted);
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px dashed var(--border);
 }
-.food-display-empty span { font-size: 48px; display: block; margin-bottom: 12px; }
-.food-display-empty p { font-size: 15px; }
+.food-display-empty span {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+.food-display-empty p {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .food-display-grid { gap: 24px; }
+}
 
 @media (max-width: 600px) {
-  .food-display-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .food-display { margin-top: 48px; }
+  .food-display-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
-@media (max-width: 380px) {
+
+@media (max-width: 480px) {
   .food-display-grid { grid-template-columns: 1fr; }
 }

@@ -1,61 +1,70 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Package, 
-  Users, 
-  ShoppingBag, 
-  PlusCircle, 
-  CreditCard, 
-  Settings,
-  X,
-  Utensils
+import {
+  LayoutDashboard, Package, Users, ShoppingBag,
+  PlusCircle, CreditCard, Settings, X, Utensils
 } from 'lucide-react';
 import './Sidebar.css';
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/orders',    icon: Package, label: 'Orders' },
-  { to: '/users',     icon: Users, label: 'Users' },
-  { to: '/list',      icon: ShoppingBag, label: 'Products' },
-  { to: '/add',       icon: PlusCircle, label: 'Add Product' },
-  { to: '/payments',  icon: CreditCard, label: 'Payments' },
-  { to: '/settings',  icon: Settings, label: 'Settings' },
+  { to: '/orders',    icon: Package,          label: 'Orders'    },
+  { to: '/users',     icon: Users,            label: 'Users'     },
+  { to: '/list',      icon: ShoppingBag,      label: 'Products'  },
+  { to: '/add',       icon: PlusCircle,       label: 'Add Product'},
+  { to: '/payments',  icon: CreditCard,       label: 'Payments'  },
+  { to: '/settings',  icon: Settings,         label: 'Settings'  },
 ];
 
 const Sidebar = ({ open, onClose }) => {
   const location = useLocation();
 
   return (
-    <aside className={`sidebar ${open ? 'open' : 'closed'}`}>
-      {/* Brand + close button */}
+    <aside
+      className={`sidebar ${open ? 'open' : 'collapsed'}`}
+      role="navigation"
+      aria-label="Main navigation"
+    >
+
+      {/* ── Brand Header ── */}
       <div className="sb-header">
         <div className="sb-brand">
-          <div className="sb-brand-icon">
-            <Utensils size={18} />
+          <div className="sb-brand-icon" aria-hidden="true">
+            <Utensils size={18} strokeWidth={2.2} />
           </div>
           <div className="sb-brand-text">
             <span className="sb-brand-name">Roza Admin</span>
             <span className="sb-brand-sub">Food Delivery</span>
           </div>
         </div>
-        <button className="sb-close" onClick={onClose} title="Close sidebar">
-          <X size={16} />
+        <button
+          className="sb-close"
+          onClick={onClose}
+          title="Close sidebar"
+          aria-label="Close sidebar"
+        >
+          <X size={14} strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* Navigation section */}
+      {/* ── Navigation ── */}
       <div className="sb-section">
-        <span className="sb-section-label">Menu</span>
+        <span className="sb-section-label">Main Menu</span>
         <nav className="sb-nav">
           {NAV.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `sb-link${isActive || (to === '/dashboard' && location.pathname === '/') ? ' active' : ''}`
+                `sb-link${
+                  isActive || (to === '/dashboard' && location.pathname === '/')
+                    ? ' active'
+                    : ''
+                }`
               }
+              title={label}          /* used for collapsed tooltip */
+              aria-label={label}
             >
-              <span className="sb-icon">
+              <span className="sb-icon" aria-hidden="true">
                 <Icon size={18} strokeWidth={2} />
               </span>
               <span className="sb-label">{label}</span>
@@ -64,13 +73,14 @@ const Sidebar = ({ open, onClose }) => {
         </nav>
       </div>
 
-      {/* Footer */}
+      {/* ── Sidebar Footer ── */}
       <div className="sb-footer">
         <div className="sb-footer-content">
           <span className="sb-footer-text">Roza Fast Food</span>
           <span className="sb-footer-version">v1.0.0</span>
         </div>
       </div>
+
     </aside>
   );
 };

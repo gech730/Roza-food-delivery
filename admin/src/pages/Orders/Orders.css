@@ -65,7 +65,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand), #8B5CF6);
+  background: linear-gradient(135deg, var(--brand), var(--gold));
   color: white;
   font-size: 13px;
   font-weight: 700;
