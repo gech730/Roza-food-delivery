@@ -5,24 +5,24 @@ import { Upload, Plus, Loader2 } from 'lucide-react';
 import './Add.css';
 
 const CATEGORIES = [
-  'የጾም ምግቦች',
-  'የፍስክ ምግቦች',
-  'ቁርስ',
-  'ትኩስ መጠጥ',
-  'ቀዝቃዛ መጠጥ',
-  'ባህላዊ መጠጥ',
-  'መክሰስ',
-  'ፓስታና ማካሮኒ'
+  'Fasting Foods',
+  'Meat Dishes',
+  'Breakfast',
+  'Hot Drinks',
+  'Cold Drinks',
+  'Traditional Drinks',
+  'Snacks',
+  'Pasta & Macaroni'
 ];
 
 const Add = ({ url, token }) => {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({ 
-    name: '', 
-    description: '', 
-    price: '', 
-    category: 'የጾም ምግቦች' 
+  const [data, setData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: 'Fasting Foods'
   });
 
   const onChange = e => setData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -38,7 +38,7 @@ const Add = ({ url, token }) => {
       const res = await axios.post(`${url}/api/food/add`, form, { headers: { token } });
       if (res.data.success) {
         toast.success('Product added successfully!');
-        setData({ name: '', description: '', price: '', category: 'የጾም ምግቦች' });
+        setData({ name: '', description: '', price: '', category: 'Fasting Foods' });
         setImage(null);
       } else {
         toast.error(res.data.message);
@@ -52,7 +52,6 @@ const Add = ({ url, token }) => {
 
   return (
     <div className="add-page">
-      {/* Header */}
       <div className="a-page-header">
         <div>
           <h1>Add Product</h1>
@@ -62,7 +61,6 @@ const Add = ({ url, token }) => {
 
       <div className="a-card add-form-card">
         <form onSubmit={onSubmit} className="add-form">
-          {/* Image upload */}
           <div className="add-image-section">
             <label htmlFor="img-upload" className="add-image-label">
               {image ? (

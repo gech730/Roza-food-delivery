@@ -32,7 +32,7 @@ const Navarbar = ({ setShowLogin }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { getTotalCartAmount, token, logout, userInfo, url, language, setLanguage, labels } = useContext(StoreContext);
+  const { getTotalCartAmount, token, logout, userInfo, url, labels } = useContext(StoreContext);
   const { isDarkMode, toggleTheme } = useTheme();
   const menuRef = useRef(null);
 
@@ -60,7 +60,6 @@ const Navarbar = ({ setShowLogin }) => {
       document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     } else {
       navigate('/');
-      // Wait for home to mount then scroll
       setTimeout(() => {
         document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
@@ -69,12 +68,10 @@ const Navarbar = ({ setShowLogin }) => {
 
   return (
     <nav className='navbar'>
-      {/* Hamburger (mobile only) */}
       <button className="hamburger-menu" onClick={() => setMobileMenuOpen(o => !o)} aria-label="Toggle menu">
         <HamburgerIcon isOpen={mobileMenuOpen} />
       </button>
 
-      {/* Logo */}
       <Link to="/" className="navbar-logo" onClick={close}>
         <div className="navbar-logo-icon">🍲</div>
         <div className="navbar-logo-text">
@@ -83,7 +80,6 @@ const Navarbar = ({ setShowLogin }) => {
         </div>
       </Link>
 
-      {/* Nav links */}
       <ul className={`navbar-menu ${mobileMenuOpen ? 'open' : ''}`} ref={menuRef}>
         <Link
           to="/"
@@ -119,25 +115,7 @@ const Navarbar = ({ setShowLogin }) => {
         )}
       </ul>
 
-      {/* Right side */}
       <div className="navar-right">
-        <div className="language-switch">
-          <button
-            type="button"
-            className={language === 'am' ? 'active' : ''}
-            onClick={() => setLanguage('am')}
-          >
-            AM
-          </button>
-          <button
-            type="button"
-            className={language === 'en' ? 'active' : ''}
-            onClick={() => setLanguage('en')}
-          >
-            EN
-          </button>
-        </div>
-
         <button className="theme-toggle" onClick={toggleTheme} title={isDarkMode ? labels.nav.lightMode : labels.nav.darkMode}>
           {isDarkMode ? <SunIcon /> : <MoonIcon />}
         </button>

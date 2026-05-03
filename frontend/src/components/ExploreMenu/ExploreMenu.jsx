@@ -28,9 +28,9 @@ const ExploreMenu = ({ catagory, setCatagory }) => {
             <div className="explore-menu-img-wrap">
               <img src={item.menu_image} alt={item.menu_name} />
             </div>
-            <p>{labels.categories[item.menu_name] || item.menu_name}</p>
+            <p>{item.menu_name}</p>
           </div>
-        ))} 
+        ))}
       </div>
       <div className="explore-menu-divider" />
     </div>

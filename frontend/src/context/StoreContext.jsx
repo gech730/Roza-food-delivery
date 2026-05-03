@@ -4,6 +4,66 @@ import { toast } from "react-toastify";
 
 export const StoreContext = createContext(null);
 
+const labels = {
+  nav: {
+    home: "Home",
+    menu: "Menu",
+    all: "All",
+    contact: "Contact",
+    myOrders: "My Orders",
+    signIn: "Sign In",
+    profile: "Profile",
+    logout: "Logout",
+    lightMode: "Light mode",
+    darkMode: "Dark mode",
+    brandName: "Roza",
+    brandSub: "Food Delivery",
+  },
+  hero: {
+    badge: "🇪🇹 Traditional Ethiopian Food",
+    titleMain: "Delicious",
+    titleAccent: "Ethiopian Meals",
+    subtitle:
+      "Fresh injera, tibs, kitfo and more — delivered fast to your door. Taste the authentic flavors of Ethiopia.",
+    exploreButton: "Browse Menu →",
+    ordersButton: "Track Orders",
+    stats: [
+      { value: "50+", label: "Dish varieties" },
+      { value: "4.9★", label: "Rating" },
+      { value: "30 min", label: "Fast delivery" },
+      { value: "Free", label: "First order" },
+    ],
+  },
+  explore: {
+    label: "What would you like to eat?",
+    title: "Explore our menu",
+    subtitle:
+      "From fasting-friendly and meat dishes to coffee and snacks — choose the Ethiopian meal you love.",
+  },
+  foodDisplay: {
+    label: "Fresh & Delicious",
+    topDishes: "Top Dishes Near You",
+    noDishes: "No dishes found in this category.",
+  },
+  login: {
+    welcomeBack: "Welcome back!",
+    accountCreated: "Account created!",
+    login: "Login",
+    register: "Create Account",
+    fullName: "Full Name",
+    email: "Email Address",
+    password: "Password",
+    placeholderName: "Enter your full name...",
+    placeholderEmail: "your@email.com",
+    placeholderPassword: "••••••••",
+    terms: "I agree to the Privacy Policy",
+    wait: "Please wait...",
+    createAccount: "Create Account",
+    haveAccount: "Already have an account?",
+    noAccount: "Don't have an account?",
+  },
+};
+
 const StoreContextProvider = ({ children }) => {
   const url = BASE_URL;
   const [cartItems, setCartItems]   = useState({});
@@ -11,152 +71,6 @@ const StoreContextProvider = ({ children }) => {
   const [userInfo, setUserInfo]     = useState(null);
   const [food_list, setFood_list]   = useState([]);
   const [loading, setLoading]       = useState(true);
-  const [language, setLanguage]     = useState(() => localStorage.getItem("language") || "am");
-
-  const translations = {
-    am: {
-      nav: {
-        home: "መነሻ",
-        menu: "ምናሌ",
-        all: "ሁሉ",
-        contact: "አድራሻ",
-        myOrders: "ትዕዛዞቼ",
-        signIn: "ግባ",
-        profile: "ፕሮፋይል",
-        logout: "ውጣ",
-        lightMode: "Light mode",
-        darkMode: "Dark mode",
-        selectLanguage: "ቋንቋ",
-        brandName: "ሮዛ",
-        brandSub: "ምግብ ማድረሻ"
-      },
-      hero: {
-        badge: "🇪🇹 ባህላዊ የኢትዮጵያ ምግቦች",
-        titleMain: "ጣዕም ያለው",
-        titleAccent: "ኢትዮጵያዊ ምግብ",
-        subtitle: "ትኩስ እንጀራ፣ ጥብስ፣ ክትፎ እና ሌሎችም - በፍጥነት እቤቶ ድረስ እናቀርባለን። የሀበሻን ባህላዊ ጣዕም ይቅመሱ።",
-        exploreButton: "ምናሌ ይመልከቱ →",
-        ordersButton: "ትዕዛዝ ይከታተሉ",
-        stats: [
-          { value: "50+", label: "የምግብ አይነቶች" },
-          { value: "4.9★", label: "ደረጃ" },
-          { value: "30 ደቂቃ", label: "ፈጣን ማድረሻ" },
-          { value: "ነፃ", label: "ለመጀመሪያ ትዕዛዝ" }
-        ]
-      },
-      explore: {
-        label: "ምን መብላት ይፈልጋሉ?",
-        title: "ምናሌያችንን ይመልከቱ",
-        subtitle: "ከባህላዊ የፆምና የፍስክ ምግቦች፣ ከጥብስ እስከ ክትፎ — የሚወዱትን የኢትዮጵያ ምግብ ይምረጡ።"
-      },
-      foodDisplay: {
-        label: "Fresh & Delicious",
-        topDishes: "Top Dishes Near You",
-        noDishes: "No dishes found in this category."
-      },
-      login: {
-        welcomeBack: "እንኳን ደህና መጡ!",
-        accountCreated: "አካውንት ተፈጥሯል!",
-        login: "ግባ",
-        register: "አዲስ አካውንት ይፍጠሩ",
-        fullName: "ሙሉ ስም",
-        email: "ኢሜይል",
-        password: "የይለፍ ቃል",
-        placeholderName: "ሙሉ ስምዎን ያስገቡ...",
-        placeholderEmail: "your@email.com",
-        placeholderPassword: "••••••••",
-        terms: "የግላዊነት መመሪያዎችን አንብቤ ተስማምቻለሁ",
-        wait: "በማስኬድ ላይ...",
-        createAccount: "አካውንት ፍጠር",
-        haveAccount: "አካውንት አለዎት?",
-        noAccount: "አካውንት የለዎትም?"
-      },
-      categories: {
-        "የጾም ምግቦች": "የጾም ምግቦች",
-        "የፍስክ ምግቦች": "የፍስክ ምግቦች",
-        "ቁርስ": "ቁርስ",
-        "ትኩስ መጠጥ": "ትኩስ መጠጥ",
-        "ቀዝቃዛ መጠጥ": "ቀዝቃዛ መጠጥ",
-        "ባህላዊ መጠጥ": "ባህላዊ መጠጥ",
-        "መክሰስ": "መክሰስ",
-        "ፓስታና ማካሮኒ": "ፓስታና ማካሮኒ"
-      }
-    },
-    en: {
-      nav: {
-        home: "Home",
-        menu: "Menu",
-        all: "All",
-        contact: "Contact",
-        myOrders: "My Orders",
-        signIn: "Sign In",
-        profile: "Profile",
-        logout: "Logout",
-        lightMode: "Light mode",
-        darkMode: "Dark mode",
-        selectLanguage: "Language",
-        brandName: "Roza",
-        brandSub: "Food Delivery"
-      },
-      hero: {
-        badge: "🇪🇹 Traditional Ethiopian Food",
-        titleMain: "Delicious",
-        titleAccent: "Ethiopian Meals",
-        subtitle: "Fresh injera, tibs, kitfo and more — delivered fast to your door. Taste the authentic flavors of Ethiopia.",
-        exploreButton: "Browse Menu →",
-        ordersButton: "Track Orders",
-        stats: [
-          { value: "50+", label: "Dish varieties" },
-          { value: "4.9★", label: "Rating" },
-          { value: "30 min", label: "Fast delivery" },
-          { value: "Free", label: "First order" }
-        ]
-      },
-      explore: {
-        label: "What would you like to eat?",
-        title: "Explore our menu",
-        subtitle: "From fasting foods and meat dishes to coffee and sweet snacks — choose the Ethiopian meal you love."
-      },
-      foodDisplay: {
-        label: "Fresh & Delicious",
-        topDishes: "Top Dishes Near You",
-        noDishes: "No dishes found in this category."
-      },
-      login: {
-        welcomeBack: "Welcome back!",
-        accountCreated: "Account created!",
-        login: "Login",
-        register: "Create Account",
-        fullName: "Full Name",
-        email: "Email Address",
-        password: "Password",
-        placeholderName: "Enter your full name...",
-        placeholderEmail: "your@email.com",
-        placeholderPassword: "••••••••",
-        terms: "I agree to the Privacy Policy",
-        wait: "Please wait...",
-        createAccount: "Create Account",
-        haveAccount: "Already have an account?",
-        noAccount: "Don't have an account?"
-      },
-      categories: {
-        "የጾም ምግቦች": "Fasting Foods",
-        "የፍስክ ምግቦች": "Meat Dishes",
-        "ቁርስ": "Breakfast",
-        "ትኩስ መጠጥ": "Hot Drinks",
-        "ቀዝቃዛ መጠጥ": "Cold Drinks",
-        "ባህላዊ መጠጥ": "Traditional Drinks",
-        "መክሰስ": "Snacks",
-        "ፓስታና ማካሮኒ": "Pasta & Macaroni"
-      }
-    }
-  };
-
-  const labels = translations[language];
-
-  useEffect(() => {
-    localStorage.setItem("language", language);
-  }, [language]);
 
   // Persist cart to localStorage
   useEffect(() => {
@@ -346,7 +260,7 @@ const StoreContextProvider = ({ children }) => {
       userInfo,
       login, register, logout,
       updateProfile, updateProfileImage, changePassword,
-      language, setLanguage, labels
+      labels
     }}>
       {children}
     </StoreContext.Provider>

@@ -10,11 +10,11 @@ const Footer = () => (
         <div className="footer-logo">
           <div className="footer-logo-icon">🍲</div>
           <div>
-            <span className="footer-logo-name">ሮዛ ምግብ ማድረሻ</span>
-            <span className="footer-logo-tagline">የሀገር በቀል ጣዕም</span>
+            <span className="footer-logo-name">Roza Food Delivery</span>
+            <span className="footer-logo-tagline">Authentic local flavor</span>
           </div>
         </div>
-        <p>ልዩ እና የረቀቀ የኢትዮጵያ ምግብ በፍጥነት እቤቶ ድረስ እናቀርባለን።</p>
+        <p>Carefully prepared Ethiopian cuisine brought quickly to your door.</p>
         <div className="footer-social">
           <a href="#" aria-label="Facebook"><img src={assets.facebook_icon} alt="Facebook" /></a>
           <a href="#" aria-label="Twitter"><img src={assets.twitter_icon} alt="Twitter" /></a>
@@ -23,29 +23,29 @@ const Footer = () => (
       </div>
 
       <div className="footer-links">
-        <h4>ኩባንያ</h4>
+        <h4>Company</h4>
         <ul>
-          <li><Link to="/">መነሻ</Link></li>
-          <li><a href="#explorer-menu">ምናሌ</a></li>
-          <li><Link to="/contact">አድራሻችን</Link></li>
-          <li><a href="#">የግላዊነት መመሪያ</a></li>
+          <li><Link to="/">Home</Link></li>
+          <li><a href="#explorer-menu">Menu</a></li>
+          <li><Link to="/contact">Contact</Link></li>
+          <li><a href="#">Privacy policy</a></li>
         </ul>
       </div>
 
       <div className="footer-links">
-        <h4>ያግኙን</h4>
+        <h4>Contact</h4>
         <ul>
           <li>📞 +251 911 23 45 67</li>
           <li>✉️ info@rozafood.com</li>
-          <li>📍 አዲስ አበባ፣ ኢትዮጵያ</li>
-          <li>🕐 ክፍት ነው: 12:00 LT – 4:00 LT</li>
+          <li>📍 Addis Ababa, Ethiopia</li>
+          <li>🕐 Open: 12:00 – 16:00 (local)</li>
         </ul>
       </div>
     </div>
 
     <div className="footer-bottom">
-      <p>© 2026 ሮዛ ምግብ ማድረሻ. መብቱ በህግ የተጠበቀ ነው።</p>
-      <p>በኢትዮጵያ የተሰራ ❤️</p>
+      <p>© 2026 Roza Food Delivery. All rights reserved.</p>
+      <p>Made with care in Ethiopia ❤️</p>
     </div>
   </footer>
 );

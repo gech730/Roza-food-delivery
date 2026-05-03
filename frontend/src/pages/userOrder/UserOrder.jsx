@@ -6,12 +6,12 @@ import axios from 'axios';
 const STATUS_STEPS = ['pending', 'paid', 'preparing', 'out_for_delivery', 'delivered'];
 
 const STATUS_LABELS = {
-  pending: 'በመጠባበቅ ላይ (Pending)',
-  paid: 'ተረጋግጧል (Confirmed)',
-  preparing: 'በመዘጋጀት ላይ (Preparing)',
-  out_for_delivery: 'በመንገድ ላይ ነው (Out for Delivery)',
-  delivered: 'ደርሷል (Delivered)',
-  cancelled: 'ተሰርዟል (Cancelled)',
+  pending: 'Pending',
+  paid: 'Confirmed',
+  preparing: 'Preparing',
+  out_for_delivery: 'Out for delivery',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
 };
 
 const STATUS_COLORS = {
@@ -25,18 +25,18 @@ const STATUS_COLORS = {
 
 const STEP_ICONS = ['✓', '🍳', '🛵', '📦'];
 const STEP_KEYS = ['paid', 'preparing', 'out_for_delivery', 'delivered'];
-const STEP_LABELS = ['ተረጋግጧል', 'እየተዘጋጀ', 'በመንገድ ላይ', 'ደርሷል'];
+const STEP_LABELS = ['Confirmed', 'Preparing', 'Out for delivery', 'Delivered'];
 
 const getStepIndex = (status) => STEP_KEYS.indexOf(status);
 
 const EstimatedTime = ({ status }) => {
   const times = {
-    paid: '35–45 ደቂቃ',
-    preparing: '25–35 ደቂቃ',
-    out_for_delivery: '10–15 ደቂቃ',
-    delivered: 'ደርሷል',
+    paid: '35–45 min',
+    preparing: '25–35 min',
+    out_for_delivery: '10–15 min',
+    delivered: 'Delivered',
     cancelled: '—',
-    pending: 'ማረጋገጫ በመጠባበቅ ላይ',
+    pending: 'Awaiting confirmation',
   };
   return <span>{times[status] || '—'}</span>;
 };
@@ -67,15 +67,15 @@ const UserOrder = () => {
   return (
     <div className="uo-page">
       <div className="uo-header">
-        <h1>ትዕዛዞቼ (My Orders)</h1>
-        <p>{orders.length} {orders.length !== 1 ? 'ትዕዛዞች' : 'ትዕዛዝ'} ተገኝቷል</p>
+        <h1>My orders</h1>
+        <p>{orders.length} {orders.length === 1 ? 'order' : 'orders'} found</p>
       </div>
 
       {orders.length === 0 ? (
         <div className="uo-empty">
           <div className="uo-empty-icon">🛵</div>
-          <h3>ምንም ትዕዛዝ የለም (No orders yet)</h3>
-          <p>ያዘዟቸው ምግቦች እዚህ ላይ ይታያሉ።</p>
+          <h3>No orders yet</h3>
+          <p>When you place an order, it will appear here.</p>
         </div>
       ) : (
         <div className="uo-list">
@@ -87,7 +87,6 @@ const UserOrder = () => {
             return (
               <div key={order._id} className="uo-card">
 
-                {/* Card Header */}
                 <div className="uo-card-header">
                   <div className="uo-card-meta">
                     <span className="uo-order-id">#{order._id.slice(-8).toUpperCase()}</span>
@@ -108,7 +107,6 @@ const UserOrder = () => {
                   </div>
                 </div>
 
-                {/* Progress Tracker */}
                 {!isCancelled && (
                   <div className="uo-tracker">
                     {STEP_KEYS.map((step, i) => {
@@ -133,38 +131,35 @@ const UserOrder = () => {
 
                 {isCancelled && (
                   <div className="uo-cancelled-banner">
-                    ✕ ይህ ትዕዛዝ ተሰርዟል (Order cancelled)
+                    ✕ This order has been cancelled
                   </div>
                 )}
 
-                {/* Summary Row */}
                 <div className="uo-summary-row">
                   <div className="uo-summary-item">
-                    <span className="uo-label">የምግብ ብዛት</span>
+                    <span className="uo-label">Items</span>
                     <span className="uo-value">{order.items.length}</span>
                   </div>
                   <div className="uo-summary-item">
-                    <span className="uo-label">ድምር (Total)</span>
-                    <span className="uo-value uo-price">{order.totalPrice} ብር</span>
+                    <span className="uo-label">Total</span>
+                    <span className="uo-value uo-price">{order.totalPrice} ETB</span>
                   </div>
                   <div className="uo-summary-item">
-                    <span className="uo-label">ክፍያ (Payment)</span>
+                    <span className="uo-label">Payment</span>
                     <span className={`uo-value uo-pay-status ${order.isPaid ? 'paid' : ''}`}>
-                      {order.isPaid ? '✓ በቻፓ ተከፍሏል' : 'አልተከፈለም'}
+                      {order.isPaid ? '✓ Paid via Chapa' : 'Unpaid'}
                     </span>
                   </div>
                   <div className="uo-summary-item">
-                    <span className="uo-label">የሚደርስበት ጊዜ</span>
+                    <span className="uo-label">Est. arrival</span>
                     <span className="uo-value"><EstimatedTime status={order.status} /></span>
                   </div>
                 </div>
 
-                {/* Expandable Details */}
                 {isExpanded && (
                   <div className="uo-details">
-                    {/* Items */}
                     <div className="uo-section">
-                      <h4>የታዘዙ ምግቦች (Items)</h4>
+                      <h4>Items</h4>
                       <div className="uo-items-list">
                         {order.items.map((item, i) => (
                           <div key={i} className="uo-item">
@@ -175,32 +170,31 @@ const UserOrder = () => {
                             />
                             <div className="uo-item-info">
                               <span className="uo-item-name">{item.name}</span>
-                              <span className="uo-item-qty">x{item.quantity}</span>
+                              <span className="uo-item-qty">×{item.quantity}</span>
                             </div>
-                            <span className="uo-item-price">{(item.price * item.quantity).toFixed(2)} ብር</span>
+                            <span className="uo-item-price">{(item.price * item.quantity).toFixed(2)} ETB</span>
                           </div>
                         ))}
                       </div>
                       <div className="uo-price-breakdown">
                         <div className="uo-price-row">
-                          <span>የምግብ ዋጋ</span>
-                          <span>{order.itemsPrice} ብር</span>
+                          <span>Food subtotal</span>
+                          <span>{order.itemsPrice} ETB</span>
                         </div>
                         <div className="uo-price-row">
-                          <span>የማድረሻ</span>
-                          <span>{order.deliveryFee} ብር</span>
+                          <span>Delivery</span>
+                          <span>{order.deliveryFee} ETB</span>
                         </div>
                         <div className="uo-price-row total">
-                          <span>አጠቃላይ ድምር</span>
-                          <span>{order.totalPrice} ብር</span>
+                          <span>Grand total</span>
+                          <span>{order.totalPrice} ETB</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Delivery Address */}
                     {order.shippingAddress && (
                       <div className="uo-section">
-                        <h4>የማድረሻ አድራሻ (Delivery Address)</h4>
+                        <h4>Delivery address</h4>
                         <div className="uo-address">
                           <div className="uo-address-icon">📍</div>
                           <div>
@@ -215,14 +209,13 @@ const UserOrder = () => {
                   </div>
                 )}
 
-                {/* Actions */}
                 <div className="uo-actions">
                   <button className="uo-btn-track" onClick={() => { toggleExpand(order._id); fetchOrders(); }}>
-                    {isExpanded ? 'ዝርዝር ደብቅ (Hide)' : 'ሁኔታ ተከታተል (Track)'}
+                    {isExpanded ? 'Hide details' : 'Track status'}
                   </button>
                   {(order.status === 'pending' || order.status === 'paid') && (
                     <button className="uo-btn-cancel" disabled>
-                      ሰርዝ (Cancel)
+                      Cancel
                     </button>
                   )}
                 </div>

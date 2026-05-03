@@ -21,7 +21,7 @@ const LoginPopUp = ({ setShowLogin }) => {
         : await register(data.name, data.email, data.password);
 
       if (result.success) {
-        toast.success(currentState === "Login" ? "እንኳን ደህና መጡ! (Welcome back!)" : "አካውንት ተፈጥሯል! (Account created!)");
+        toast.success(currentState === "Login" ? "Welcome back!" : "Account created!");
         setShowLogin(false);
       } else {
         toast.error(result.message);

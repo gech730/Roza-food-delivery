@@ -11,7 +11,7 @@ const FoodDisplay = ({ catagory }) => {
     <div className='food-display' id='food-display'>
       <div className="food-display-header">
         <p className="food-display-label">{labels.foodDisplay.label}</p>
-        <h2>{catagory === "All" ? labels.foodDisplay.topDishes : labels.categories[catagory] || catagory}</h2>
+        <h2>{catagory === "All" ? labels.foodDisplay.topDishes : catagory}</h2>
       </div>
 
       {filtered.length === 0 ? (

@@ -129,30 +129,6 @@
   transform: translateY(-1px);
 }
 
-.language-switch {
-  display: flex;
-  gap: 6px;
-}
-
-.language-switch button {
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.language-switch button.active,
-.language-switch button:hover {
-  background: var(--brand-light);
-  color: var(--brand);
-  border-color: transparent;
-}
-
 /* Cart */
 .navbar-cart {
   position: relative;
