@@ -1,25 +1,37 @@
 import food_list from "../models/foodModel.js";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
 
 /**
  * Add New Food Item
  * Creates a new food item with image upload
  */
 const addFood = async (req, res) => {
-  let image_filename = `${req.file.filename}`;
+  // Guard: multer must have saved a file
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: "Product image is required" });
+  }
+
   try {
     const newFood = new food_list({
-      name: req.body.name,
+      name:        req.body.name,
       description: req.body.description,
-      price: req.body.price,
-      image: image_filename,
-      category: req.body.category,
+      price:       Number(req.body.price),
+      image:       req.file.filename,
+      category:    req.body.category,
     });
 
     await newFood.save();
     res.status(201).json({ success: true, message: "Food added successfully", newFood });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Error adding food"});
+    // Clean up the uploaded file if DB save fails
+    fs.unlink(path.join(UPLOADS_DIR, req.file.filename), () => {});
+    res.status(500).json({ success: false, message: "Error adding food" });
   }
 };
 
@@ -55,10 +67,10 @@ const deleteFood = async (req, res) => {
     const food = await food_list.findById(req.body.id);
     if (!food)
       return res.status(404).json({ success: false, message: "Food item not found" });
-    
+
     // Delete the image file from uploads folder
-    fs.unlink(`uploads/${food.image}`, () => {});
-    
+    fs.unlink(path.join(UPLOADS_DIR, food.image), () => {});
+
     await food_list.findByIdAndDelete(req.body.id);
     res.status(200).json({ success: true, message: "Food removed successfully" });
   } catch (err) {
@@ -91,7 +103,7 @@ const updateFood = async (req, res) => {
     // If new image is uploaded, use it and delete old image
     if (req.file) {
       // Delete old image
-      fs.unlink(`uploads/${existingFood.image}`, () => {});
+      fs.unlink(path.join(UPLOADS_DIR, existingFood.image), () => {});
       updateData.image = req.file.filename;
     }
     

@@ -173,7 +173,7 @@ const List = ({ url, token }) => {
                           className="edit-input edit-input-price"
                         />
                       ) : (
-                        <span className="product-price">${item.price}</span>
+                        <span className="product-price">{item.price} ETB</span>
                       )}
                     </td>
                     <td>

@@ -5,7 +5,7 @@
 /* Summary Stats */
 .pay-summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -31,7 +31,7 @@
 }
 
 .pay-stat-value {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--text);
 }
@@ -49,27 +49,68 @@
 .pay-filters {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .pay-table-wrap {
   overflow-x: auto;
 }
 
-/* Order ID */
-.pay-order-id {
+/* Customer cell */
+.pay-customer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pay-customer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-light);
+  color: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pay-customer-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.pay-customer-email {
   font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Transaction ID */
+.pay-order-id {
+  font-size: 11px;
   font-weight: 700;
   color: var(--brand);
   font-family: ui-monospace, monospace;
   background: var(--brand-light);
   padding: 4px 8px;
   border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Items count */
+.pay-items-count {
+  font-size: 13px;
+  color: var(--text2);
 }
 
 /* Method */
 .pay-method {
   font-size: 13px;
   color: var(--text2);
+  font-weight: 500;
 }
 
 /* Amount */
@@ -77,38 +118,58 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--success);
+  white-space: nowrap;
 }
 
-/* Date */
+/* Dates */
+.pay-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .pay-date {
   font-size: 13px;
   color: var(--muted);
+  white-space: nowrap;
+}
+
+.pay-paid-at {
+  font-size: 11px;
+  color: var(--success);
+  white-space: nowrap;
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .pay-summary {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .pay-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
-  
+
   .pay-toolbar {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .pay-toolbar .a-search {
     max-width: 100%;
   }
-  
+
   .pay-filters {
     overflow-x: auto;
     padding-bottom: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pay-summary {
+    grid-template-columns: 1fr;
   }
 }

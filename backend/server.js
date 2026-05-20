@@ -4,6 +4,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import { mkdirSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
@@ -15,8 +17,13 @@ import adminRouter from "./routes/adminRoute.js";
 
 dotenv.config();
 
+// Resolve uploads directory relative to this file (not cwd)
+const __filename  = fileURLToPath(import.meta.url);
+const __dirname   = path.dirname(__filename);
+const UPLOADS_DIR = path.join(__dirname, "uploads");
+
 // Ensure uploads folder exists on fresh deploys
-try { mkdirSync("uploads", { recursive: true }); } catch (_) {}
+try { mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (_) {}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -99,7 +106,7 @@ app.use("/api/user/register", authLimiter);
 app.use("/api/admin/login",   authLimiter);
 
 /* ── STATIC FILES ─────────────────────────────────────────────────────────── */
-app.use("/images", express.static("uploads"));
+app.use("/images", express.static(UPLOADS_DIR));
 
 /* ── DATABASE ─────────────────────────────────────────────────────────────── */
 connectDB();

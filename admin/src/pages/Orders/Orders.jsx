@@ -186,7 +186,7 @@ const Orders = ({ url, token }) => {
                           <span className="order-items">{order.items?.length} item{order.items?.length !== 1 ? 's' : ''}</span>
                         </td>
                         <td>
-                          <span className="order-amount">${order.totalPrice}</span>
+                          <span className="order-amount">{order.totalPrice} ETB</span>
                         </td>
                         <td>
                           <span
@@ -246,7 +246,7 @@ const Orders = ({ url, token }) => {
                                         <span className="order-item-name">{item.name}</span>
                                         <span className="order-item-qty">Qty: {item.quantity}</span>
                                       </div>
-                                      <span className="order-item-price">${item.price * item.quantity}</span>
+                                      <span className="order-item-price">{item.price * item.quantity} ETB</span>
                                     </div>
                                   ))}
                                 </div>

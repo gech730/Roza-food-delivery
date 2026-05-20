@@ -7,6 +7,7 @@ import {
   listOrders,
   updateStatus,
   getOrderById,
+  listPayments,
 } from "../controllers/orderController.js";
 import authMiddleware from "../middleware/auth.js";
 import adminAuthMiddleware from "../middleware/adminAuth.js";
@@ -22,8 +23,9 @@ orderRouter.get("/verify/:tx_ref",  verifyPayment);
 orderRouter.post("/userorders",     authMiddleware, userOrders);
 
 // Admin routes
-orderRouter.post("/list",    adminAuthMiddleware, listOrders);
-orderRouter.post("/status",  adminAuthMiddleware, updateStatus);
-orderRouter.post("/getbyid", adminAuthMiddleware, getOrderById);
+orderRouter.post("/list",     adminAuthMiddleware, listOrders);
+orderRouter.post("/status",   adminAuthMiddleware, updateStatus);
+orderRouter.post("/getbyid",  adminAuthMiddleware, getOrderById);
+orderRouter.get("/payments",  adminAuthMiddleware, listPayments);
 
 export default orderRouter;

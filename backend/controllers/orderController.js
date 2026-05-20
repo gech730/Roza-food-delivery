@@ -180,6 +180,45 @@ const getOrderById = async (req, res) => {
   }
 };
 
+// List payments — derived from orders, joined with user info
+const listPayments = async (req, res) => {
+  try {
+    const { page = 1, limit = 50, status } = req.query;
+    const filter = status && status !== "all" ? { isPaid: status === "paid" } : {};
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [orders, total] = await Promise.all([
+      orderModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .populate("userId", "name email"),
+      orderModel.countDocuments(filter),
+    ]);
+
+    const payments = orders.map((o) => ({
+      _id:           o._id,
+      tx_ref:        o.tx_ref,
+      orderId:       o._id.toString(),
+      userName:      o.userId?.name  || "Unknown",
+      userEmail:     o.userId?.email || o.paymentResult?.email || "—",
+      amount:        o.totalPrice,
+      method:        o.paymentMethod || "Chapa",
+      status:        o.isPaid ? "completed" : o.status === "cancelled" ? "failed" : "pending",
+      isPaid:        o.isPaid,
+      paidAt:        o.paidAt,
+      createdAt:     o.createdAt,
+      itemsCount:    o.items?.length || 0,
+    }));
+
+    res.json({ success: true, data: payments, total, page: Number(page) });
+  } catch (error) {
+    console.log("List payments error:", error);
+    res.json({ success: false, message: "Error fetching payments" });
+  }
+};
+
 export {
   paymentInitialize,
   verifyPayment,
@@ -188,4 +227,5 @@ export {
   listOrders,
   updateStatus,
   getOrderById,
+  listPayments,
 };

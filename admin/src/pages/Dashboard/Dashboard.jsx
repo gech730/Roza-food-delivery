@@ -39,7 +39,7 @@ const STATUS_META = {
 };
 
 const fmt = (n) => new Intl.NumberFormat().format(n ?? 0);
-const fmtMoney = (n) => `$${(n ?? 0).toFixed(2)}`;
+const fmtMoney = (n) => `${(n ?? 0).toFixed(2)} ETB`;
 
 // Generate mock chart data based on real stats
 const generateChartData = (monthOrders, monthRevenue) => {
@@ -338,7 +338,7 @@ const Dashboard = ({ url, token }) => {
             <div className="ds-rev-item">
               <span className="ds-rev-label">Avg. Order Value</span>
               <span className="ds-rev-value warning">
-                {totalOrders > 0 ? fmtMoney(stats.totalRevenue / totalOrders) : '$0.00'}
+                {totalOrders > 0 ? fmtMoney(stats.totalRevenue / totalOrders) : '0.00 ETB'}
               </span>
             </div>
             <div className="ds-rev-item">

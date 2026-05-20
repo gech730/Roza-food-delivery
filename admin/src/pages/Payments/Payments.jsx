@@ -1,76 +1,82 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { 
-  Search, 
-  CreditCard, 
-  CheckCircle, 
-  Clock, 
+import {
+  Search,
+  CreditCard,
+  CheckCircle,
+  Clock,
   XCircle,
-  DollarSign,
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  User,
 } from 'lucide-react';
 import './Payments.css';
 
 const Payments = ({ url, token }) => {
-  const [payments, setPayments] = useState([]);
-  const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, failed: 0 });
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
-  const [search, setSearch] = useState('');
+  const [payments, setPayments]   = useState([]);
+  const [stats, setStats]         = useState({ totalRevenue: 0, completed: 0, pending: 0, failed: 0 });
+  const [loading, setLoading]     = useState(true);
+  const [filter, setFilter]       = useState('all');
+  const [search, setSearch]       = useState('');
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${url}/api/payment/list`, { headers: { token } });
+      const res = await axios.get(`${url}/api/order/payments`, { headers: { token } });
       if (res.data.success) {
-        setPayments(res.data.data || []);
-        // Calculate stats
         const data = res.data.data || [];
-        const completed = data.filter(p => p.status === 'completed');
+        setPayments(data);
         setStats({
-          total: data.reduce((s, p) => s + (p.amount || 0), 0),
-          completed: completed.length,
-          pending: data.filter(p => p.status === 'pending').length,
-          failed: data.filter(p => p.status === 'failed').length
+          totalRevenue: data
+            .filter(p => p.status === 'completed')
+            .reduce((s, p) => s + (p.amount || 0), 0),
+          completed: data.filter(p => p.status === 'completed').length,
+          pending:   data.filter(p => p.status === 'pending').length,
+          failed:    data.filter(p => p.status === 'failed').length,
         });
+      } else {
+        toast.error(res.data.message || 'Failed to load payments');
       }
-    } catch {
-      // Silent fail - API might not exist
+    } catch (err) {
+      console.error('Payments fetch error:', err);
+      toast.error('Failed to load payments');
       setPayments([]);
     } finally {
       setLoading(false);
     }
   }, [url, token]);
 
-  useEffect(() => {
-    fetchPayments();
-  }, [fetchPayments]);
+  useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
   const filtered = payments.filter(p => {
     if (filter !== 'all' && p.status !== filter) return false;
-    if (search && !p.orderId?.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return (
+        p.tx_ref?.toLowerCase().includes(q) ||
+        p.userName?.toLowerCase().includes(q) ||
+        p.userEmail?.toLowerCase().includes(q) ||
+        p.orderId?.toLowerCase().includes(q)
+      );
+    }
     return true;
   });
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed': return <CheckCircle size={14} />;
-      case 'pending': return <Clock size={14} />;
-      case 'failed': return <XCircle size={14} />;
-      default: return <CreditCard size={14} />;
-    }
+  const statusIcon = (s) => {
+    if (s === 'completed') return <CheckCircle size={13} />;
+    if (s === 'failed')    return <XCircle size={13} />;
+    return <Clock size={13} />;
   };
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case 'completed': return { background: 'var(--success-bg)', color: 'var(--success)' };
-      case 'pending': return { background: 'var(--warning-bg)', color: 'var(--warning)' };
-      case 'failed': return { background: 'var(--danger-bg)', color: 'var(--danger)' };
-      default: return {};
-    }
+  const statusStyle = (s) => {
+    if (s === 'completed') return { background: 'var(--success-bg)', color: 'var(--success)' };
+    if (s === 'failed')    return { background: 'var(--danger-bg)',  color: 'var(--danger)'  };
+    return { background: 'var(--warning-bg)', color: 'var(--warning)' };
   };
+
+  const fmtDate = (d) =>
+    d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
   return (
     <div className="payments-page">
@@ -78,7 +84,7 @@ const Payments = ({ url, token }) => {
       <div className="a-page-header">
         <div>
           <h1>Payments</h1>
-          <p>Manage payment transactions</p>
+          <p>{payments.length} total transactions</p>
         </div>
         <button className="a-btn a-btn-ghost" onClick={fetchPayments}>
           <RefreshCw size={16} />
@@ -90,11 +96,11 @@ const Payments = ({ url, token }) => {
       <div className="pay-summary">
         <div className="a-card pay-stat">
           <div className="pay-stat-icon" style={{ color: 'var(--brand)' }}>
-            <DollarSign size={28} />
+            <TrendingUp size={28} />
           </div>
           <div>
             <p className="pay-stat-label">Total Revenue</p>
-            <p className="pay-stat-value">${stats.total.toLocaleString()}</p>
+            <p className="pay-stat-value">{stats.totalRevenue.toLocaleString()} ETB</p>
           </div>
         </div>
         <div className="a-card pay-stat">
@@ -115,6 +121,15 @@ const Payments = ({ url, token }) => {
             <p className="pay-stat-value">{stats.pending}</p>
           </div>
         </div>
+        <div className="a-card pay-stat">
+          <div className="pay-stat-icon" style={{ color: 'var(--danger)' }}>
+            <XCircle size={28} />
+          </div>
+          <div>
+            <p className="pay-stat-label">Failed</p>
+            <p className="pay-stat-value">{stats.failed}</p>
+          </div>
+        </div>
       </div>
 
       {/* Toolbar */}
@@ -122,7 +137,7 @@ const Payments = ({ url, token }) => {
         <div className="a-search">
           <Search size={16} className="a-search-icon" />
           <input
-            placeholder="Search by order ID..."
+            placeholder="Search by name, email or transaction ID..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -140,12 +155,10 @@ const Payments = ({ url, token }) => {
         </div>
       </div>
 
-      {/* Payments Table */}
+      {/* Table */}
       <div className="a-card">
         {loading ? (
-          <div className="a-spinner-wrap">
-            <div className="a-spinner" />
-          </div>
+          <div className="a-spinner-wrap"><div className="a-spinner" /></div>
         ) : filtered.length === 0 ? (
           <div className="a-empty">
             <CreditCard size={48} strokeWidth={1.5} className="a-empty-icon" />
@@ -156,41 +169,56 @@ const Payments = ({ url, token }) => {
             <table className="a-table">
               <thead>
                 <tr>
-                  <th>Order ID</th>
-                  <th>Method</th>
+                  <th>Customer</th>
+                  <th>Transaction ID</th>
+                  <th>Items</th>
                   <th>Amount</th>
+                  <th>Method</th>
                   <th>Status</th>
                   <th>Date</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(payment => (
-                  <tr key={payment._id}>
+                {filtered.map(p => (
+                  <tr key={p._id}>
                     <td>
-                      <span className="pay-order-id">{payment.orderId?.slice(-8) || 'N/A'}</span>
+                      <div className="pay-customer">
+                        <div className="pay-customer-avatar">
+                          <User size={14} />
+                        </div>
+                        <div>
+                          <p className="pay-customer-name">{p.userName}</p>
+                          <p className="pay-customer-email">{p.userEmail}</p>
+                        </div>
+                      </div>
                     </td>
                     <td>
-                      <span className="pay-method">{payment.method || 'Card'}</span>
-                    </td>
-                    <td>
-                      <span className="pay-amount">${payment.amount?.toFixed(2) || '0.00'}</span>
-                    </td>
-                    <td>
-                      <span className="a-badge" style={getStatusStyle(payment.status)}>
-                        {getStatusIcon(payment.status)}
-                        {payment.status || 'unknown'}
+                      <span className="pay-order-id" title={p.tx_ref}>
+                        {p.tx_ref ? p.tx_ref.slice(-10) : p.orderId.slice(-8)}
                       </span>
                     </td>
                     <td>
-                      <span className="pay-date">
-                        {payment.createdAt
-                          ? new Date(payment.createdAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })
-                          : 'N/A'}
+                      <span className="pay-items-count">{p.itemsCount} item{p.itemsCount !== 1 ? 's' : ''}</span>
+                    </td>
+                    <td>
+                      <span className="pay-amount">{(p.amount || 0).toLocaleString()} ETB</span>
+                    </td>
+                    <td>
+                      <span className="pay-method">{p.method}</span>
+                    </td>
+                    <td>
+                      <span className="a-badge" style={statusStyle(p.status)}>
+                        {statusIcon(p.status)}
+                        {p.status}
                       </span>
+                    </td>
+                    <td>
+                      <div className="pay-dates">
+                        <span className="pay-date">{fmtDate(p.createdAt)}</span>
+                        {p.paidAt && (
+                          <span className="pay-paid-at">Paid: {fmtDate(p.paidAt)}</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
