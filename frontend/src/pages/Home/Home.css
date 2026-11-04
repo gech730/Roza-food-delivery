@@ -1,10 +1,6 @@
-.home-container {
+.home-redesign-wrapper {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: 100%;
-}
-
-.home-menu-wrapper {
-  scroll-margin-top: 90px;
+  overflow-x: hidden;
 }

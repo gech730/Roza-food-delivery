@@ -31,18 +31,20 @@ const App = () => {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       {showLogin && <LoginPopUp setShowLogin={setShowLogin} />}
 
-      <div className='app'>
+      <div className="app">
         <Navarbar setShowLogin={setShowLogin} />
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/cart' element={<Cart />} />
-          <Route path='/contact' element={<Contact />} />
-          <Route path='/order'    element={<Protected><PlaceOrder /></Protected>} />
-          <Route path='/verify'   element={<Verify />} />
-          <Route path='/myOrders' element={<Protected><UserOrder /></Protected>} />
-          <Route path='/profile'  element={<Protected><Profile /></Protected>} />
-          <Route path='*' element={<Navigate to="/" replace />} />
-        </Routes>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/cart" element={<div className="subpage-container"><Cart /></div>} />
+            <Route path="/contact" element={<div className="subpage-container"><Contact /></div>} />
+            <Route path="/order" element={<Protected><div className="subpage-container"><PlaceOrder /></div></Protected>} />
+            <Route path="/verify" element={<div className="subpage-container"><Verify /></div>} />
+            <Route path="/myOrders" element={<Protected><div className="subpage-container"><UserOrder /></div></Protected>} />
+            <Route path="/profile" element={<Protected><div className="subpage-container"><Profile /></div></Protected>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
         <Footer />
       </div>
     </>

@@ -98,3 +98,4 @@ const PromoBanner = ({ onSelectCategory }) => {
 };
 
 export default PromoBanner;
+
