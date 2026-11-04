@@ -38,8 +38,9 @@
 /* Featured Menu Grid */
 .home-menu-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 28px;
+  width: 100%;
 }
 
 .home-section-cta {
