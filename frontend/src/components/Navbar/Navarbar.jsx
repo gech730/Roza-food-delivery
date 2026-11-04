@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import './Navarbar.css';
 import { assets } from '../../assets/assets.js';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
 
@@ -59,9 +59,7 @@ const Navarbar = ({ setShowLogin }) => {
       }
     };
 
-    // Call once initially
     handleScroll();
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -88,26 +86,23 @@ const Navarbar = ({ setShowLogin }) => {
     navigate('/');
   };
 
-  const profileImg = userInfo?.profileImage ? `${url}/images/${userInfo.profileImage}` : null;
-
-  // Smooth scroll helper
-  const scrollTo = (sectionId) => {
+  // Smart Order Now button logic
+  const handleOrderNow = (e) => {
+    e.preventDefault();
     close();
-    if (isHome) {
-      const el = document.getElementById(sectionId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+    const cartAmount = getTotalCartAmount();
+    if (cartAmount > 0) {
+      if (token) {
+        navigate('/order');
+      } else {
+        navigate('/cart');
       }
     } else {
-      navigate('/');
-      setTimeout(() => {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 300);
+      navigate('/menu');
     }
   };
+
+  const profileImg = userInfo?.profileImage ? `${url}/images/${userInfo.profileImage}` : null;
 
   return (
     <header className={`header-navbar-wrapper ${isScrolled ? 'is-scrolled' : 'is-transparent'} ${!isHome ? 'is-solid-always' : ''}`}>
@@ -130,72 +125,93 @@ const Navarbar = ({ setShowLogin }) => {
           </div>
         </Link>
 
-        {/* Nav Links */}
+        {/* Nav Links: Separate Dedicated Pages */}
         <nav
           className={`navbar-nav ${mobileMenuOpen ? 'open' : ''}`}
           ref={menuRef}
           aria-label="Main menu"
         >
-          <button
-            type="button"
-            className="nav-link-btn"
-            onClick={() => scrollTo('hero')}
+          <NavLink
+            to="/"
+            end
+            onClick={close}
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           >
             Home
-          </button>
+          </NavLink>
 
-          <button
-            type="button"
-            className="nav-link-btn"
-            onClick={() => scrollTo('menu')}
+          <NavLink
+            to="/menu"
+            onClick={close}
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           >
             Menu
-          </button>
+          </NavLink>
 
-          <button
-            type="button"
-            className="nav-link-btn"
-            onClick={() => scrollTo('about')}
+          <NavLink
+            to="/about"
+            onClick={close}
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           >
             About
-          </button>
+          </NavLink>
 
-          <button
-            type="button"
-            className="nav-link-btn"
-            onClick={() => scrollTo('reviews')}
+          <NavLink
+            to="/services"
+            onClick={close}
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
+          >
+            Services
+          </NavLink>
+
+          <NavLink
+            to="/reviews"
+            onClick={close}
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           >
             Reviews
-          </button>
+          </NavLink>
 
-          <button
-            type="button"
-            className="nav-link-btn"
-            onClick={() => scrollTo('contact')}
+          <NavLink
+            to="/contact"
+            onClick={close}
+            className={({ isActive }) => `nav-link-btn ${isActive ? 'active' : ''}`}
           >
             Contact
-          </button>
+          </NavLink>
 
           {token && (
-            <Link to="/myOrders" onClick={close} className="nav-link-btn nav-link-mobile-only">
+            <NavLink
+              to="/myOrders"
+              onClick={close}
+              className={({ isActive }) => `nav-link-btn nav-link-mobile-only ${isActive ? 'active' : ''}`}
+            >
               My Orders
-            </Link>
+            </NavLink>
           )}
 
-          {/* Highlighted Order Now button inside mobile drawer */}
+          {/* Highlighted Order Now inside mobile drawer */}
           <div className="mobile-drawer-cta">
-            <Link to="/order" onClick={close} className="nav-order-now-btn">
+            <button
+              type="button"
+              onClick={handleOrderNow}
+              className="nav-order-now-btn"
+            >
               Order Now
-            </Link>
+            </button>
           </div>
         </nav>
 
         {/* Right Action Icons & CTA */}
         <div className="navbar-right">
           {/* Highlighted Order Now Button on Desktop */}
-          <Link to="/order" className="nav-order-now-btn desktop-cta">
+          <button
+            type="button"
+            onClick={handleOrderNow}
+            className="nav-order-now-btn desktop-cta"
+          >
             Order Now
-          </Link>
+          </button>
 
           {/* Theme Switcher */}
           <button

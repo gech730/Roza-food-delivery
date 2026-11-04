@@ -4,13 +4,6 @@ import { Link } from 'react-router-dom';
 import { CONTACT_INFO } from '../../constants/homeData';
 
 const Footer = () => {
-  const scrollTo = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <footer className="footer-section" id="footer">
       <div className="footer-container">
@@ -26,7 +19,7 @@ const Footer = () => {
             </Link>
 
             <p className="footer-blurb">
-              Roza Fast Food brings you the authentic soul of Ethiopian cuisine. Freshly baked 100% teff injera, fragrant berbere stews, and prime sizzled meats prepared with heritage care and delivered with modern speed.
+              Roza Fast Food brings you the authentic soul of Ethiopian cuisine. Freshly baked 100% teff injera, fragrant berbere stews, and prime sizzled meats prepared with heritage care and delivered with modern speed across Addis Ababa.
             </p>
 
             <div className="footer-social-row">
@@ -45,39 +38,27 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links Column */}
+          {/* Quick Links Column (Separate Pages) */}
           <div className="footer-col">
-            <h4 className="footer-heading">Quick Links</h4>
+            <h4 className="footer-heading">Pages</h4>
             <ul className="footer-list">
               <li>
-                <button type="button" onClick={() => scrollTo('hero')} className="footer-nav-link">
-                  Home
-                </button>
+                <Link to="/" className="footer-nav-link">Home</Link>
               </li>
               <li>
-                <button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">
-                  Our Menu
-                </button>
+                <Link to="/menu" className="footer-nav-link">Our Menu</Link>
               </li>
               <li>
-                <button type="button" onClick={() => scrollTo('about')} className="footer-nav-link">
-                  Meet Roza (About)
-                </button>
+                <Link to="/about" className="footer-nav-link">Meet Roza (About)</Link>
               </li>
               <li>
-                <button type="button" onClick={() => scrollTo('services')} className="footer-nav-link">
-                  Services & Pricing
-                </button>
+                <Link to="/services" className="footer-nav-link">Services & Pricing</Link>
               </li>
               <li>
-                <button type="button" onClick={() => scrollTo('reviews')} className="footer-nav-link">
-                  Customer Reviews
-                </button>
+                <Link to="/reviews" className="footer-nav-link">Customer Reviews</Link>
               </li>
               <li>
-                <button type="button" onClick={() => scrollTo('contact')} className="footer-nav-link">
-                  Contact & Orders
-                </button>
+                <Link to="/contact" className="footer-nav-link">Contact & Orders</Link>
               </li>
             </ul>
           </div>
@@ -86,12 +67,36 @@ const Footer = () => {
           <div className="footer-col">
             <h4 className="footer-heading">Menu Highlights</h4>
             <ul className="footer-list">
-              <li><button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">Injera & Stews (Wot)</button></li>
-              <li><button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">Sizzling Tibs</button></li>
-              <li><button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">Traditional Kitfo</button></li>
-              <li><button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">Vegan Fasting (Beyaynetu)</button></li>
-              <li><button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">Family Platters</button></li>
-              <li><button type="button" onClick={() => scrollTo('menu')} className="footer-nav-link">Beverages & Coffee</button></li>
+              <li>
+                <Link to="/menu?category=Injera%20%26%20Stews" className="footer-nav-link">
+                  Injera & Stews (Wot)
+                </Link>
+              </li>
+              <li>
+                <Link to="/menu?category=Tibs" className="footer-nav-link">
+                  Sizzling Tibs
+                </Link>
+              </li>
+              <li>
+                <Link to="/menu?category=Kitfo" className="footer-nav-link">
+                  Traditional Kitfo
+                </Link>
+              </li>
+              <li>
+                <Link to="/menu?category=Fasting%20Food" className="footer-nav-link">
+                  Vegan Fasting (Beyaynetu)
+                </Link>
+              </li>
+              <li>
+                <Link to="/services" className="footer-nav-link">
+                  Family Platters
+                </Link>
+              </li>
+              <li>
+                <Link to="/menu?category=Drinks" className="footer-nav-link">
+                  Beverages & Coffee
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -129,11 +134,11 @@ const Footer = () => {
             © {new Date().getFullYear()} Roza Fast Food Delivery. All rights reserved. Made with ❤️ in Addis Ababa.
           </p>
           <div className="footer-legal-links">
-            <a href="#privacy">Privacy Policy</a>
+            <Link to="/about">About Us</Link>
             <span className="dot-sep">•</span>
-            <a href="#terms">Terms of Service</a>
+            <Link to="/contact">Support</Link>
             <span className="dot-sep">•</span>
-            <a href="#security">Delivery Guarantee</a>
+            <Link to="/services">Delivery Guarantee</Link>
           </div>
         </div>
       </div>

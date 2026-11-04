@@ -1,78 +1,202 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Contact.css';
+import { toast } from 'react-toastify';
+import { CONTACT_INFO } from '../../constants/homeData';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    interest: 'Regular Delivery Order',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!formData.name.trim()) {
+      toast.error('Please enter your full name.');
+      return;
+    }
+    if (!formData.email.trim() || !formData.email.includes('@')) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      toast.error('Please enter your phone number.');
+      return;
+    }
+    if (!formData.message.trim()) {
+      toast.error('Please enter your message or order inquiry.');
+      return;
+    }
+
+    setSubmitting(true);
+    setTimeout(() => {
+      setSubmitting(false);
+      toast.success('Thank you! Your message has been sent. We will get back to you shortly.');
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        interest: 'Regular Delivery Order',
+        message: ''
+      });
+    }, 700);
+  };
+
   return (
-    <div className="contact-page">
-      <div className="contact-header">
-        <h1>Contact us</h1>
-        <p>Reach out for questions, catering, or feedback—we are glad to help.</p>
+    <div className="contact-page-wrapper">
+      <div className="contact-page-header">
+        <span className="page-tag">We Are Here For You</span>
+        <h1 className="page-title">Contact Roza Fast Food</h1>
+        <div className="page-title-line"></div>
+        <p className="page-subtitle">
+          Whether you need a custom family catering mesob, have questions about your delivery, or want to partner with us in Addis Ababa.
+        </p>
       </div>
 
-      <div className="contact-container">
-        <div className="contact-info">
-          <h2>Get in touch</h2>
-          <p>Roza fast delivery—always here when you need a great meal.</p>
+      <div className="contact-two-column-layout">
+        {/* Info Column */}
+        <div className="contact-details-panel">
+          <h2 className="panel-title">Direct Contact</h2>
+          <p className="panel-desc">
+            Reach out directly to our kitchen, dispatch team, or customer care representatives.
+          </p>
 
-          <div className="info-item">
-            <span className="icon">📍</span>
-            <div>
-              <h3>Address</h3>
-              <p>Bole Road, Addis Ababa, Ethiopia</p>
+          <div className="contact-points-list">
+            <div className="contact-point">
+              <span className="point-icon">📍</span>
+              <div>
+                <h4>Kitchen & Headquarters</h4>
+                <p>{CONTACT_INFO.address}</p>
+              </div>
+            </div>
+
+            <div className="contact-point">
+              <span className="point-icon">📞</span>
+              <div>
+                <h4>Phone / Order Hotline</h4>
+                {CONTACT_INFO.phones.map((p, idx) => (
+                  <p key={idx}><a href={`tel:${p}`}>{p}</a></p>
+                ))}
+              </div>
+            </div>
+
+            <div className="contact-point">
+              <span className="point-icon">✉️</span>
+              <div>
+                <h4>Email Inquiries</h4>
+                <p><a href={`mailto:${CONTACT_INFO.email}`}>{CONTACT_INFO.email}</a></p>
+              </div>
+            </div>
+
+            <div className="contact-point">
+              <span className="point-icon">🕒</span>
+              <div>
+                <h4>Kitchen Hours</h4>
+                <p>{CONTACT_INFO.hours}</p>
+              </div>
             </div>
           </div>
 
-          <div className="info-item">
-            <span className="icon">📞</span>
-            <div>
-              <h3>Phone</h3>
-              <p>+251 911 23 45 67</p>
-              <p>+251 116 12 34 56</p>
-            </div>
-          </div>
-
-          <div className="info-item">
-            <span className="icon">✉️</span>
-            <div>
-              <h3>Email</h3>
-              <p>info@rozafood.com</p>
-              <p>support@rozafood.com</p>
-            </div>
-          </div>
-
-          <div className="info-item">
-            <span className="icon">🕒</span>
-            <div>
-              <h3>Hours</h3>
-              <p>Monday – Sunday: 12:00 – 16:00 (local)</p>
+          <div className="contact-socials-group">
+            <span className="socials-heading">Connect With Us:</span>
+            <div className="socials-row">
+              {CONTACT_INFO.socials.map((soc) => (
+                <a
+                  key={soc.name}
+                  href={soc.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="social-pill"
+                >
+                  <span>{soc.icon}</span>
+                  <span>{soc.name}</span>
+                </a>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="contact-form">
-          <h2>Send a message</h2>
-          <form onSubmit={(e) => { e.preventDefault(); alert('Message sent. Thank you!'); }}>
+        {/* Form Column */}
+        <div className="contact-form-panel">
+          <h2 className="panel-title">Send a Direct Message</h2>
+          <p className="panel-desc">Fill in the fields below and our team will respond within 30 minutes.</p>
+
+          <form onSubmit={handleSubmit} className="contact-panel-form" noValidate>
             <div className="form-group">
-              <label>Full name</label>
-              <input type="text" placeholder="Your name" required />
+              <label>Full Name *</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Abebe Bikila"
+                required
+              />
+            </div>
+
+            <div className="form-row-2col">
+              <div className="form-group">
+                <label>Email Address *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="abebe@example.com"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Phone Number *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+251 911 00 00 00"
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-group">
-              <label>Email</label>
-              <input type="email" placeholder="you@example.com" required />
+              <label>Topic / Inquiry Type</label>
+              <select name="interest" value={formData.interest} onChange={handleChange}>
+                <option value="Regular Delivery Order">Regular Delivery Order</option>
+                <option value="Celebration / Wedding Catering">Celebration / Wedding Catering</option>
+                <option value="Family Platters">Family Platters</option>
+                <option value="Corporate Office Lunch">Corporate Office Lunch</option>
+                <option value="Event Orders">Event Orders</option>
+                <option value="General Feedback">General Feedback</option>
+              </select>
             </div>
 
             <div className="form-group">
-              <label>Subject</label>
-              <input type="text" placeholder="What is this about?" required />
+              <label>Message / Order Details *</label>
+              <textarea
+                name="message"
+                rows="4"
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="Tell us what you'd like to order, preferred date/time, delivery address or questions..."
+                required
+              ></textarea>
             </div>
 
-            <div className="form-group">
-              <label>Message</label>
-              <textarea rows="5" placeholder="Write your message here..." required></textarea>
-            </div>
-
-            <button type="submit" className="submit-btn">Send message</button>
+            <button type="submit" className="submit-message-btn" disabled={submitting}>
+              {submitting ? 'Sending Request...' : 'Send Message'}
+            </button>
           </form>
         </div>
       </div>

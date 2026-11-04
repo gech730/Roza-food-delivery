@@ -22,7 +22,7 @@ const Cart = () => {
           <span>🛒</span>
           <h3>Your cart is empty</h3>
           <p>Browse our menu and add Ethiopian dishes you would like to order.</p>
-          <button onClick={() => navigate('/')}>Browse Menu</button>
+          <button onClick={() => navigate('/menu')}>Browse Menu</button>
         </div>
       ) : (
         <div className="cart-layout">
@@ -74,7 +74,7 @@ const Cart = () => {
             >
               Checkout →
             </button>
-            <button className="cart-continue-btn" onClick={() => navigate('/')}>
+            <button className="cart-continue-btn" onClick={() => navigate('/menu')}>
               ← Continue Shopping
             </button>
           </div>

@@ -132,6 +132,19 @@
   width: 100%;
 }
 
+.nav-link-btn.active {
+  color: #C0392B !important;
+  font-weight: 700;
+}
+
+.header-navbar-wrapper.is-transparent .nav-link-btn.active {
+  color: #F59E0B !important;
+}
+
+.nav-link-btn.active::after {
+  width: 100%;
+}
+
 .nav-link-mobile-only {
   display: none;
 }

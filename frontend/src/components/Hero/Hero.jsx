@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './Hero.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { StoreContext } from '../../context/StoreContext';
 import { HERO_SLIDES, HERO_TICKER_ITEMS } from '../../constants/homeData';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const { getTotalCartAmount, token } = useContext(StoreContext);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scrollY, setScrollY] = useState(0);
 
-  // Parallax scroll effect: smooth translation based on user scrolling
+  // Parallax scroll effect
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -45,10 +48,17 @@ const Hero = () => {
     setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   };
 
-  const scrollToMenu = () => {
-    const el = document.getElementById('menu');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  // Smart Order Now action
+  const handleOrderNow = () => {
+    const totalAmount = getTotalCartAmount();
+    if (totalAmount > 0) {
+      if (token) {
+        navigate('/order');
+      } else {
+        navigate('/cart');
+      }
+    } else {
+      navigate('/menu');
     }
   };
 
@@ -99,25 +109,26 @@ const Hero = () => {
         </div>
 
         <div className="hero-actions">
-          <button
-            type="button"
-            onClick={scrollToMenu}
-            className="hero-btn hero-btn-primary"
-          >
+          <Link to="/menu" className="hero-btn hero-btn-primary">
             <span>View Menu</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <polyline points="19 12 12 19 5 12"></polyline>
-            </svg>
-          </button>
-
-          <Link to="/order" className="hero-btn hero-btn-secondary">
-            <span>Order Now</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </Link>
+
+          <button
+            type="button"
+            onClick={handleOrderNow}
+            className="hero-btn hero-btn-secondary"
+          >
+            <span>Order Now</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </button>
         </div>
 
         {/* Slide Controls & 2.5s Progress Indicators */}
