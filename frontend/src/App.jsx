@@ -20,8 +20,7 @@ import Profile from './pages/Profile/Profile.jsx';
 import { StoreContext } from './context/StoreContext.jsx';
 
 const App = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const { token, getTotalCartAmount } = useContext(StoreContext);
+  const { token, getTotalCartAmount, showLogin, setShowLogin } = useContext(StoreContext);
 
   // Protected route for checkout: if not logged in, redirects to cart and prompts sign in
   const ProtectedOrder = ({ children }) => {

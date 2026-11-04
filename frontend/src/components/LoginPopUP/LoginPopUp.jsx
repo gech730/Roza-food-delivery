@@ -62,11 +62,6 @@ const LoginPopUp = ({ setShowLogin }) => {
           </div>
         </div>
 
-        <div className="login-popup-terms">
-          <input type="checkbox" id="terms" required />
-          <label htmlFor="terms"><a href="#">{labels.login.terms}</a></label>
-        </div>
-
         <button type="submit" className="login-popup-btn" disabled={loading}>
           {loading ? labels.login.wait : currentState === "Login" ? labels.login.login : labels.login.createAccount}
         </button>

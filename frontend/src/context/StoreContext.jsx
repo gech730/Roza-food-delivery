@@ -72,6 +72,8 @@ const StoreContextProvider = ({ children }) => {
   const [userInfo, setUserInfo]     = useState(null);
   const [food_list, setFood_list]   = useState(defaultFoodList || []);
   const [loading, setLoading]       = useState(true);
+  const [showLogin, setShowLogin]   = useState(false);
+  const [pendingCartItem, setPendingCartItem] = useState(null);
 
   // Persist cart to localStorage
   useEffect(() => {
@@ -156,7 +158,8 @@ const StoreContextProvider = ({ children }) => {
 
   const addToCart = async (itemId) => {
     if (!token) {
-      toast.info("Please sign in to add items to cart");
+      setPendingCartItem(itemId);
+      setShowLogin(true);
       return;
     }
     setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
@@ -167,7 +170,7 @@ const StoreContextProvider = ({ children }) => {
       const msg = err.message?.toLowerCase() || "";
       if (msg.includes("session") || msg.includes("login") || msg.includes("authorized")) {
         logout();
-        toast.info("Session expired. Please sign in again.");
+        setShowLogin(true);
       } else {
         toast.error("Failed to update cart");
       }
@@ -204,6 +207,17 @@ const StoreContextProvider = ({ children }) => {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
         await Promise.all([loadCartData(res.data.token), loadUserProfile(res.data.token)]);
+
+        // Automatically add pending item if user tried to add before logging in
+        if (pendingCartItem) {
+          const itemToAdd = pendingCartItem;
+          setPendingCartItem(null);
+          try {
+            await api.post("/api/cart/add", { itemId: itemToAdd }, { headers: { token: res.data.token } });
+            setCartItems((prev) => ({ ...prev, [itemToAdd]: (prev[itemToAdd] || 0) + 1 }));
+          } catch {}
+        }
+
         return { success: true };
       }
       return { success: false, message: res.data.message };
@@ -219,6 +233,17 @@ const StoreContextProvider = ({ children }) => {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
         await Promise.all([loadCartData(res.data.token), loadUserProfile(res.data.token)]);
+
+        // Automatically add pending item if user tried to add before registering
+        if (pendingCartItem) {
+          const itemToAdd = pendingCartItem;
+          setPendingCartItem(null);
+          try {
+            await api.post("/api/cart/add", { itemId: itemToAdd }, { headers: { token: res.data.token } });
+            setCartItems((prev) => ({ ...prev, [itemToAdd]: (prev[itemToAdd] || 0) + 1 }));
+          } catch {}
+        }
+
         return { success: true };
       }
       return { success: false, message: res.data.message };
@@ -273,7 +298,8 @@ const StoreContextProvider = ({ children }) => {
       userInfo,
       login, register, logout,
       updateProfile, updateProfileImage, changePassword,
-      labels
+      labels,
+      showLogin, setShowLogin
     }}>
       {children}
     </StoreContext.Provider>
