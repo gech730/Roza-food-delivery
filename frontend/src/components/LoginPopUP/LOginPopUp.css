@@ -170,3 +170,77 @@
   color: var(--brand-hover);
   text-decoration: underline;
 }
+
+
+.demo-policy-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color var(--transition-fast);
+  font-family: inherit;
+}
+.demo-policy-btn:hover {
+  color: var(--brand-hover);
+}
+
+.demo-policy-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand-gold);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  animation: fadeIn 0.2s ease;
+}
+
+.demo-policy-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.demo-policy-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #D97706;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.demo-policy-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px;
+}
+.demo-policy-close:hover {
+  color: var(--text-primary);
+}
+
+.demo-policy-box h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.demo-policy-box p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
