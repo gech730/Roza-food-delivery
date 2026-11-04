@@ -83,8 +83,16 @@
 
 .food-display-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 28px;
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .food-display-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 .food-display-empty {

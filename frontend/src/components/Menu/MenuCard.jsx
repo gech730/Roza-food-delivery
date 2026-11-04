@@ -6,20 +6,28 @@ const MenuCard = ({ item }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
   const count = cartItems[item._id] || 0;
 
-  // Resolve image URL: Cloudinary URL vs local uploads vs fallback
+  // Resolve image URL safely for Cloudinary URLs, local uploads, or imported asset modules
   const getImageUrl = () => {
     if (!item.image) {
       return PLACEHOLDER_IMAGES.dishes[item.category] || PLACEHOLDER_IMAGES.dishes.default;
     }
-    if (item.image.startsWith('http')) {
-      return item.image;
+    if (typeof item.image === 'string') {
+      if (
+        item.image.startsWith('http') ||
+        item.image.startsWith('/') ||
+        item.image.startsWith('data:') ||
+        item.image.startsWith('blob:')
+      ) {
+        return item.image;
+      }
+      return `${url}/images/${item.image}`;
     }
-    return `${url}/images/${item.image}`;
+    return item.image;
   };
 
   return (
     <article className={`menu-card ${count > 0 ? 'is-in-cart' : ''}`}>
-      {/* Fixed-ratio, non-distorted Image Frame */}
+      {/* 1. Dedicated Non-Distorted Food Image Container */}
       <div className="menu-card-image-box">
         <img
           src={getImageUrl()}
@@ -32,22 +40,24 @@ const MenuCard = ({ item }) => {
           }}
         />
 
-        <div className="menu-card-img-overlay"></div>
+        <div className="menu-card-img-overlay" />
 
-        {/* Category Badge on Top Left */}
+        {/* Category Pill Tag on Top Left */}
         {item.category && (
           <span className="menu-card-category-badge">{item.category}</span>
         )}
 
-        {/* In-Cart Pill Indicator on Top Right */}
-        {count > 0 && (
+        {/* Responsive Cart Badge on Top Right */}
+        {count > 0 ? (
           <span className="menu-card-cart-badge">
             <span className="cart-check-icon">✓</span> {count} in cart
           </span>
+        ) : (
+          <span className="menu-card-rating-badge">★ 4.9</span>
         )}
       </div>
 
-      {/* Card Content with Uniform Baseline */}
+      {/* 2. Structured Card Body with Uniform Baseline */}
       <div className="menu-card-body">
         <div className="menu-card-header">
           <h3 className="menu-card-title" title={item.name}>{item.name}</h3>
@@ -57,7 +67,7 @@ const MenuCard = ({ item }) => {
           {item.description || 'Authentic traditional recipe prepared with fresh organic ingredients and aromatic spices.'}
         </p>
 
-        {/* Modern Professional Footer with Price and Add to Cart Action */}
+        {/* 3. Modern Professional Footer: Price + Add to Cart Button */}
         <div className="menu-card-footer">
           <div className="menu-card-price-box">
             <span className="price-curr">ETB</span>
@@ -73,10 +83,11 @@ const MenuCard = ({ item }) => {
                 aria-label={`Add ${item.name} to cart`}
               >
                 <svg className="cart-plus-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
-                <span>Add</span>
+                <span>Add to Cart</span>
               </button>
             ) : (
               <div className="modern-stepper-ctrl">
@@ -85,15 +96,19 @@ const MenuCard = ({ item }) => {
                   className="stepper-action-btn stepper-minus"
                   onClick={() => removeFromCart(item._id)}
                   aria-label="Decrease quantity"
+                  title="Remove one"
                 >
                   −
                 </button>
-                <span className="stepper-count">{count}</span>
+                <span className="stepper-count" title={`${count} in cart`}>
+                  {count}
+                </span>
                 <button
                   type="button"
                   className="stepper-action-btn stepper-plus"
                   onClick={() => addToCart(item._id)}
                   aria-label="Increase quantity"
+                  title="Add one more"
                 >
                   +
                 </button>

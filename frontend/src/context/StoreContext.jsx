@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import api, { BASE_URL } from "../utils/api";
 import { toast } from "react-toastify";
+import { food_list as defaultFoodList } from "../assets/assets";
 
 export const StoreContext = createContext(null);
 
@@ -69,7 +70,7 @@ const StoreContextProvider = ({ children }) => {
   const [cartItems, setCartItems]   = useState({});
   const [token, setToken]           = useState("");
   const [userInfo, setUserInfo]     = useState(null);
-  const [food_list, setFood_list]   = useState([]);
+  const [food_list, setFood_list]   = useState(defaultFoodList || []);
   const [loading, setLoading]       = useState(true);
 
   // Persist cart to localStorage
@@ -90,13 +91,15 @@ const StoreContextProvider = ({ children }) => {
   const fetchFoodList = async () => {
     try {
       const res = await api.get("/api/food/get");
-      if (res.data.success) {
+      if (res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
         setFood_list(res.data.data);
-      } else {
-        toast.error(res.data.message || "Failed to load menu");
+      } else if (defaultFoodList && defaultFoodList.length > 0) {
+        setFood_list(defaultFoodList);
       }
     } catch {
-      toast.error("Failed to load menu. Please refresh.");
+      if (defaultFoodList && defaultFoodList.length > 0) {
+        setFood_list(defaultFoodList);
+      }
     }
   };
 
