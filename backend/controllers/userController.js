@@ -2,7 +2,7 @@ import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
-import fs from "fs";
+import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 /**
  * Create JWT Token
@@ -12,7 +12,6 @@ const createToken = (userId) => {
   const sign = jwt.sign({ userId }, process.env.JWT_SECRET);
   return sign;
 };
-
 
 const login = async (req, res) => {
   try {
@@ -51,9 +50,7 @@ const login = async (req, res) => {
   }
 };
 
-
- //  Creates new user account
- 
+// Creates new user account
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -97,7 +94,7 @@ const register = async (req, res) => {
     const token = createToken(user._id);
     res.json({ 
       success: true, 
-      token,
+      token, 
       userId: user._id,
       name: user.name,
       email: user.email,
@@ -109,9 +106,7 @@ const register = async (req, res) => {
   }
 };
 
-
-//  Get User Profile
- 
+// Get User Profile
 const getUserProfile = async (req, res) => {
   try {
     const { userId } = req;
@@ -136,9 +131,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-//  Update User Profile
-
- 
+// Update User Profile
 const updateUserProfile = async (req, res) => {
   try {
     const { userId } = req;
@@ -165,25 +158,24 @@ const updateUserProfile = async (req, res) => {
     const existingUser = await userModel.findById(userId);
     if (!existingUser) {
       return res.json({ success: false, message: "User not found" });
-    };
+    }
     
- 
     const updateData = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
     
     if (req.file) {
-      // Delete old image if exists
+      const uploadResult = await uploadToCloudinary(req.file.buffer, {
+        folder: "roza_food/users",
+      });
+
+      // Delete old image from Cloudinary if exists
       if (existingUser.profileImage) {
-        const oldImagePath = `uploads/${existingUser.profileImage}`;
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
+        await deleteFromCloudinary(existingUser.profileImage);
       }
-      updateData.profileImage = req.file.filename;
+      updateData.profileImage = uploadResult.secure_url;
     }
     
- 
     const updatedUser = await userModel.findByIdAndUpdate(
       userId, 
       updateData,
@@ -202,7 +194,6 @@ const updateUserProfile = async (req, res) => {
 };
 
 // Change User Password
-
 const changePassword = async (req, res) => {
   try {
     const { userId } = req;
@@ -231,7 +222,6 @@ const changePassword = async (req, res) => {
       });
     }
     
-
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await userModel.findByIdAndUpdate(userId, { password: hashedPassword });
     
@@ -240,17 +230,6 @@ const changePassword = async (req, res) => {
     console.log("Change password error:", error);
     res.json({ success: false, message: "Error changing password" });
   }
-};
-
-export { 
-  login, 
-  register,
-  getUserProfile,
-  updateUserProfile,
-  changePassword,
-  listUsers,
-  blockUser,
-  deleteUser,
 };
 
 // Admin: list all users with pagination
@@ -286,9 +265,24 @@ async function blockUser(req, res) {
 async function deleteUser(req, res) {
   try {
     const { userId } = req.body;
+    const user = await userModel.findById(userId);
+    if (user?.profileImage) {
+      await deleteFromCloudinary(user.profileImage);
+    }
     await userModel.findByIdAndDelete(userId);
     res.json({ success: true, message: 'User deleted' });
   } catch (error) {
     res.json({ success: false, message: 'Error deleting user' });
   }
 }
+
+export { 
+  login, 
+  register,
+  getUserProfile,
+  updateUserProfile,
+  changePassword,
+  listUsers,
+  blockUser,
+  deleteUser,
+};

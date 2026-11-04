@@ -30,25 +30,28 @@ const Cart = () => {
             <div className="cart-items-head">
               <span>Item</span><span>Price</span><span>Qty</span><span>Total</span><span></span>
             </div>
-            {cartFoods.map((item, i) => (
-              <div key={i} className="cart-item">
-                <div className="cart-item-info">
-                  <img src={`${url}/images/${item.image}`} alt={item.name} onError={e => { e.target.src = '/logo.png'; }} />
-                  <div>
-                    <p className="cart-item-name">{item.name}</p>
-                    <p className="cart-item-cat">{item.category}</p>
+            {cartFoods.map((item, i) => {
+              const imgUrl = item.image?.startsWith('http') ? item.image : `${url}/images/${item.image}`;
+              return (
+                <div key={i} className="cart-item">
+                  <div className="cart-item-info">
+                    <img src={imgUrl} alt={item.name} onError={e => { e.target.src = '/logo.png'; }} />
+                    <div>
+                      <p className="cart-item-name">{item.name}</p>
+                      <p className="cart-item-cat">{item.category}</p>
+                    </div>
                   </div>
+                  <span className="cart-item-price">{item.price} ETB</span>
+                  <div className="cart-item-qty">
+                    <button onClick={() => removeFromCart(item._id)}>−</button>
+                    <span>{cartItems[item._id]}</span>
+                    <button onClick={() => addToCart(item._id)}>+</button>
+                  </div>
+                  <span className="cart-item-total">{item.price * cartItems[item._id]} ETB</span>
+                  <button className="cart-item-remove" onClick={() => removeFromCart(item._id)} aria-label="Remove">✕</button>
                 </div>
-                <span className="cart-item-price">{item.price} ETB</span>
-                <div className="cart-item-qty">
-                  <button onClick={() => removeFromCart(item._id)}>−</button>
-                  <span>{cartItems[item._id]}</span>
-                  <button onClick={() => addToCart(item._id)}>+</button>
-                </div>
-                <span className="cart-item-total">{item.price * cartItems[item._id]} ETB</span>
-                <button className="cart-item-remove" onClick={() => removeFromCart(item._id)} aria-label="Remove">✕</button>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="cart-summary">

@@ -115,7 +115,7 @@ const Settings = ({ url, token, admin, setAdmin, theme, setTheme }) => {
 
           <div className="settings-avatar-wrap">
             <div className="settings-avatar-rel">
-              {admin?.avatar ? (
+              { (admin?.profileImage || admin?.avatar) ? (
                 <img src={`${url}/images/${admin.avatar}`} alt="Avatar" className="settings-avatar" />
               ) : (
                 <div className="settings-avatar-placeholder">

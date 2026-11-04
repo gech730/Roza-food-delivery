@@ -15,10 +15,6 @@ build/
 **/dist/
 **/build/
 
-# Uploads (user-generated content — use cloud storage in production)
-backend/uploads/*
-!backend/uploads/.gitkeep
-
 # Logs
 *.log
 npm-debug.log*

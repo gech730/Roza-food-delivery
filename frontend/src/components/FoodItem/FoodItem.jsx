@@ -6,11 +6,12 @@ import { StoreContext } from '../../context/StoreContext';
 const FoodItem = ({ id, name, price, description, image }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
   const qty = cartItems[id] || 0;
+  const imageUrl = image?.startsWith('http') ? image : `${url}/images/${image}`;
 
   return (
     <div className='food-card'>
       <div className="food-card-img">
-        <img src={`${url}/images/${image}`} alt={name} onError={e => { e.target.src = '/logo.png'; }} />
+        <img src={imageUrl} alt={name} onError={e => { e.target.src = '/logo.png'; }} />
         <div className="food-card-overlay">
           {qty === 0 ? (
             <button className="food-add-btn" onClick={() => addToCart(id)} aria-label="Add to cart">

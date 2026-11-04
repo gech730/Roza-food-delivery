@@ -11,10 +11,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Normalize error responses
+// Normalize error responses and clear invalid tokens
 api.interceptors.response.use(
   (res) => res,
   (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+    }
     const message = error.response?.data?.message || error.message || "Something went wrong";
     return Promise.reject(new Error(message));
   }

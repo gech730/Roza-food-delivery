@@ -1,37 +1,35 @@
 import food_list from "../models/foodModel.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 /**
  * Add New Food Item
- * Creates a new food item with image upload
+ * Uploads image directly to Cloudinary and creates a new food item
  */
 const addFood = async (req, res) => {
-  // Guard: multer must have saved a file
+  // Guard: multer must have buffered a file
   if (!req.file) {
     return res.status(400).json({ success: false, message: "Product image is required" });
   }
 
   try {
+    // Upload image buffer to Cloudinary
+    const uploadResult = await uploadToCloudinary(req.file.buffer, {
+      folder: "roza_food/foods",
+    });
+
     const newFood = new food_list({
-      name:        req.body.name,
+      name: req.body.name,
       description: req.body.description,
-      price:       Number(req.body.price),
-      image:       req.file.filename,
-      category:    req.body.category,
+      price: Number(req.body.price),
+      image: uploadResult.secure_url,
+      category: req.body.category,
     });
 
     await newFood.save();
     res.status(201).json({ success: true, message: "Food added successfully", newFood });
   } catch (err) {
-    // Clean up the uploaded file if DB save fails
-    fs.unlink(path.join(UPLOADS_DIR, req.file.filename), () => {});
-    res.status(500).json({ success: false, message: "Error adding food" });
+    console.error("Error adding food:", err);
+    res.status(500).json({ success: false, message: err.message || "Error adding food" });
   }
 };
 
@@ -60,16 +58,19 @@ const readFood = async (req, res) => {
 
 /**
  * Delete Food Item
- * Removes a food item and its image from the server
+ * Removes a food item and cleans up its image from Cloudinary
  */
 const deleteFood = async (req, res) => {
   try {
     const food = await food_list.findById(req.body.id);
-    if (!food)
+    if (!food) {
       return res.status(404).json({ success: false, message: "Food item not found" });
+    }
 
-    // Delete the image file from uploads folder
-    fs.unlink(path.join(UPLOADS_DIR, food.image), () => {});
+    // Clean up image from Cloudinary
+    if (food.image) {
+      await deleteFromCloudinary(food.image);
+    }
 
     await food_list.findByIdAndDelete(req.body.id);
     res.status(200).json({ success: true, message: "Food removed successfully" });
@@ -80,46 +81,49 @@ const deleteFood = async (req, res) => {
 
 /**
  * Update Food Item
- * Edits an existing food item's details
+ * Edits an existing food item's details with optional new image upload
  */
 const updateFood = async (req, res) => {
   try {
     const { id, name, description, price, category } = req.body;
-    
+
     // Find existing food item
     const existingFood = await food_list.findById(id);
     if (!existingFood) {
       return res.status(404).json({ success: false, message: "Food item not found" });
     }
-    
+
     // Prepare update object
     const updateData = {
       name: name || existingFood.name,
       description: description || existingFood.description,
-      price: price || existingFood.price,
+      price: price !== undefined ? Number(price) : existingFood.price,
       category: category || existingFood.category,
     };
-    
-    // If new image is uploaded, use it and delete old image
+
+    // If new image is uploaded, send to Cloudinary and clean up old image
     if (req.file) {
-      // Delete old image
-      fs.unlink(path.join(UPLOADS_DIR, existingFood.image), () => {});
-      updateData.image = req.file.filename;
+      const uploadResult = await uploadToCloudinary(req.file.buffer, {
+        folder: "roza_food/foods",
+      });
+
+      if (existingFood.image) {
+        await deleteFromCloudinary(existingFood.image);
+      }
+
+      updateData.image = uploadResult.secure_url;
     }
-    
+
     // Update the food item
-    const updatedFood = await food_list.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
-    
-    res.status(200).json({ 
-      success: true, 
-      message: "Food updated successfully", 
-      data: updatedFood 
+    const updatedFood = await food_list.findByIdAndUpdate(id, updateData, { new: true });
+
+    res.status(200).json({
+      success: true,
+      message: "Food updated successfully",
+      data: updatedFood,
     });
   } catch (err) {
+    console.error("Error updating food:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -131,8 +135,9 @@ const updateFood = async (req, res) => {
 const getFoodById = async (req, res) => {
   try {
     const food = await food_list.findById(req.body.id);
-    if (!food)
+    if (!food) {
       return res.status(404).json({ success: false, message: "Food item not found" });
+    }
     res.status(200).json({ success: true, data: food });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

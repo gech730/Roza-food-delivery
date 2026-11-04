@@ -1,16 +1,15 @@
 import adminModel from "../models/adminModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import fs from "fs";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import foodModel from "../models/foodModel.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-   
     const admin = await adminModel.findOne({ email });
     if (!admin) {
       return res.json({ success: false, message: "Admin not found!" });
@@ -24,6 +23,7 @@ const adminLogin = async (req, res) => {
     const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
+
     res.json({
       success: true,
       token,
@@ -32,6 +32,7 @@ const adminLogin = async (req, res) => {
         name: admin.name,
         email: admin.email,
         profileImage: admin.profileImage,
+        avatar: admin.profileImage,
       },
     });
   } catch (error) {
@@ -49,7 +50,7 @@ const adminRegister = async (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
       return res.json({ success: false, message: "All fields are required" });
-    };
+    }
 
     const existAdmin = await adminModel.findOne({ email });
     if (existAdmin) {
@@ -63,7 +64,7 @@ const adminRegister = async (req, res) => {
         success: false,
         message: "Admin registration not allowed",
       });
-    };
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newAdmin = new adminModel({
@@ -78,7 +79,8 @@ const adminRegister = async (req, res) => {
     const token = jwt.sign({ id: newAdmin._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-     res.json({
+
+    res.json({
       success: true,
       token,
       message: "Admin registered successfully",
@@ -86,6 +88,7 @@ const adminRegister = async (req, res) => {
         name: newAdmin.name,
         email: newAdmin.email,
         profileImage: newAdmin.profileImage,
+        avatar: newAdmin.profileImage,
       },
     });
   } catch (error) {
@@ -103,7 +106,10 @@ const getAdminProfile = async (req, res) => {
       return res.json({ success: false, message: "Admin not found" });
     }
 
-    res.json({ success: true, data: admin });
+    const adminObj = admin.toObject();
+    adminObj.avatar = adminObj.profileImage;
+
+    res.json({ success: true, data: adminObj, admin: adminObj });
   } catch (error) {
     console.log("Get admin profile error:", error);
     res.json({ success: false, message: "Error fetching profile" });
@@ -127,7 +133,7 @@ const updateAdminProfile = async (req, res) => {
         email,
         _id: { $ne: adminId },
       });
-      
+
       if (existingAdmin) {
         return res.json({ success: false, message: "Email already in use" });
       }
@@ -138,34 +144,80 @@ const updateAdminProfile = async (req, res) => {
       return res.json({ success: false, message: "Admin not found" });
     }
 
-
     const updateData = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
 
-
     if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer, {
+        folder: "roza_food/admin",
+      });
+
       if (existingAdmin.profileImage) {
-        const oldImagePath = `uploads/${existingAdmin.profileImage}`;
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
+        await deleteFromCloudinary(existingAdmin.profileImage);
       }
-      updateData.profileImage = req.file.filename;
+
+      updateData.profileImage = uploadResult.secure_url;
     }
 
     const updatedAdmin = await adminModel
       .findByIdAndUpdate(adminId, updateData, { new: true })
       .select("-password");
 
+    const adminObj = updatedAdmin.toObject();
+    adminObj.avatar = adminObj.profileImage;
+
     res.json({
       success: true,
       message: "Profile updated successfully",
-      data: updatedAdmin,
+      data: adminObj,
+      admin: adminObj,
     });
   } catch (error) {
     console.log("Update admin profile error:", error);
     res.json({ success: false, message: "Error updating profile" });
+  }
+};
+
+/**
+ * Update Admin Avatar (Dedicated endpoint for Settings avatar upload)
+ */
+const updateAdminAvatar = async (req, res) => {
+  try {
+    const adminId = req.adminId;
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Avatar image required" });
+    }
+
+    const existingAdmin = await adminModel.findById(adminId);
+    if (!existingAdmin) {
+      return res.status(404).json({ success: false, message: "Admin not found" });
+    }
+
+    const uploadResult = await uploadToCloudinary(req.file.buffer, {
+      folder: "roza_food/admin",
+    });
+
+    if (existingAdmin.profileImage) {
+      await deleteFromCloudinary(existingAdmin.profileImage);
+    }
+
+    const updatedAdmin = await adminModel
+      .findByIdAndUpdate(adminId, { profileImage: uploadResult.secure_url }, { new: true })
+      .select("-password");
+
+    const adminObj = updatedAdmin.toObject();
+    adminObj.avatar = adminObj.profileImage;
+
+    res.json({
+      success: true,
+      message: "Avatar updated successfully",
+      admin: adminObj,
+      data: adminObj,
+    });
+  } catch (error) {
+    console.log("Update admin avatar error:", error);
+    res.status(500).json({ success: false, message: "Error uploading avatar" });
   }
 };
 
@@ -268,6 +320,7 @@ export {
   adminRegister,
   getAdminProfile,
   updateAdminProfile,
+  updateAdminAvatar,
   changeAdminPassword,
   getDashboardStats,
 };

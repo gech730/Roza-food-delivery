@@ -4,38 +4,14 @@ import {
   adminRegister, 
   getAdminProfile,
   updateAdminProfile,
+  updateAdminAvatar,
   changeAdminPassword,
   getDashboardStats,
 } from "../controllers/adminController.js";
 import adminAuthMiddleware from "../middleware/adminAuth.js";
-import multer from "multer";
+import upload from "../middleware/upload.js";
 
 const adminRouter = Router();
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
-  filename: (req, file, cb) => {
-    return cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed!"), false);
-    }
-  }
-});
-
 
 // POST /api/admin/login - Admin login
 adminRouter.post("/login", adminLogin);
@@ -46,8 +22,14 @@ adminRouter.post("/register", adminRegister);
 // GET /api/admin/profile 
 adminRouter.get("/profile", adminAuthMiddleware, getAdminProfile);
 
-// POST /api/admin/update 
+// POST /api/admin/profile - Profile info update (name, email)
+adminRouter.post("/profile", adminAuthMiddleware, updateAdminProfile);
+
+// POST /api/admin/update - Profile update with optional profileImage
 adminRouter.post("/update", adminAuthMiddleware, upload.single("profileImage"), updateAdminProfile);
+
+// POST /api/admin/avatar - Avatar upload via Cloudinary
+adminRouter.post("/avatar", adminAuthMiddleware, upload.single("avatar"), updateAdminAvatar);
 
 // POST /api/admin/password 
 adminRouter.post("/password", adminAuthMiddleware, changeAdminPassword);
