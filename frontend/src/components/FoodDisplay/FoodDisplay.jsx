@@ -81,6 +81,7 @@ const FoodDisplay = ({ catagory, setCatagory, searchQuery, setSearchQuery }) => 
               price={item.price}
               description={item.description}
               image={item.image}
+              category={item.category}
             />
           ))}
         </div>

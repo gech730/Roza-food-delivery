@@ -1,0 +1,331 @@
+/* ==========================================================================
+   ROZA FAST FOOD - MODERN FOOD CARD COMPONENT
+   Guarantees non-distorted image ratio, uniform card heights, and premium
+   pill "Add to Cart" button with seamless interactive quantity stepper.
+   ========================================================================== */
+
+.menu-card {
+  background: var(--surface, #FFFFFF);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border, #E5E7EB);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  min-width: 0;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  position: relative;
+}
+
+.menu-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+  border-color: rgba(192, 57, 43, 0.3);
+}
+
+.menu-card.is-in-cart {
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   1. FIXED-ASPECT IMAGE CONTAINER (NO DISTORTION)
+   -------------------------------------------------------------------------- */
+.menu-card-image-box {
+  position: relative;
+  width: 100%;
+  height: 215px;
+  min-height: 215px;
+  max-height: 215px;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #2b3040 0%, #151821 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.menu-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.menu-card:hover .menu-card-img {
+  transform: scale(1.06);
+}
+
+.menu-card-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.45) 100%);
+  pointer-events: none;
+}
+
+/* Category Badge (Top-Left) */
+.menu-card-category-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(17, 20, 28, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #F59E0B;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Rating Badge (Top-Right) */
+.menu-card-rating-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(17, 20, 28, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #F59E0B;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* In-Cart Pill Badge (Top-Right) */
+.menu-card-cart-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(16, 185, 129, 0.95);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #FFFFFF;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+  animation: fadeIn 0.22s ease-out;
+}
+
+.cart-check-icon {
+  font-weight: 900;
+  font-size: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   2. CARD BODY & CONTENT
+   -------------------------------------------------------------------------- */
+.menu-card-body {
+  padding: 18px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.menu-card-header {
+  margin-bottom: 6px;
+}
+
+.menu-card-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #1F2937);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+.menu-card-description {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13.5px;
+  color: var(--text-secondary, #4B5563);
+  line-height: 1.55;
+  margin: 6px 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 42px;
+}
+
+/* --------------------------------------------------------------------------
+   3. CARD FOOTER: PRICE & MODERN BUTTON / STEPPER
+   -------------------------------------------------------------------------- */
+.menu-card-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #E5E7EB);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-card-price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.price-curr {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted, #9CA3AF);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.price-val {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 21px;
+  font-weight: 800;
+  color: #C0392B;
+  line-height: 1;
+}
+
+.menu-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* --------------------------------------------------------------------------
+   4. MODERN PROFESSIONAL ADD TO CART PILL BUTTON
+   -------------------------------------------------------------------------- */
+.btn-add-to-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #C0392B 0%, #D93828 100%);
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(192, 57, 43, 0.35);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 125px;
+  height: 40px;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-add-to-cart:hover {
+  background: linear-gradient(135deg, #D93828 0%, #B82E20 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(192, 57, 43, 0.48);
+}
+
+.btn-add-to-cart:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+}
+
+.btn-add-to-cart svg {
+  flex-shrink: 0;
+  stroke: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   5. INTERACTIVE QUANTITY STEPPER (ITEM IN CART)
+   -------------------------------------------------------------------------- */
+.modern-stepper-ctrl {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface2, #F8FAFC);
+  border: 1.5px solid rgba(192, 57, 43, 0.35);
+  border-radius: 9999px;
+  padding: 3px 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  height: 40px;
+  min-width: 115px;
+  justify-content: space-between;
+}
+
+.stepper-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #C0392B;
+  color: #FFFFFF;
+  font-size: 17px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.stepper-action-btn:hover {
+  background: #A93226;
+  transform: scale(1.08);
+}
+
+.stepper-action-btn:active {
+  transform: scale(0.92);
+}
+
+.stepper-plus:hover {
+  background: #10B981;
+}
+
+.stepper-count {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #C0392B;
+  padding: 0 8px;
+  min-width: 22px;
+  text-align: center;
+  user-select: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

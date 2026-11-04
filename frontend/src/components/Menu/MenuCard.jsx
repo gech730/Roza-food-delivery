@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import './MenuCard.css';
 import { StoreContext } from '../../context/StoreContext';
 import { PLACEHOLDER_IMAGES } from '../../constants/homeData';
 
